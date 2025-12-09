@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> ระบบบันทึกการเรียนการสอน-โรงเรียนสกลราชวิทยานุกูล </title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="icon" href="https://sakolraj.ac.th/wp-content/uploads/2024/07/Copy-of-Gold-Elegant-Wedding-Circular-Logo-2-1.png" type="image/png">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS ในหน้าเดียวกัน -->
+    <style>
+        :root {
+            --primary-color: #C00000;
+            --primary-dark: #a00000;
+            --primary-light: #ff4d4d;
+            --secondary-color: #f8f9fa;
+            --text-color: #333333;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            font-family: 'Sarabun', 'kanit', sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            border-bottom: 3px solid var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white !important;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+        }
+
+        .navbar-brand img {
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        /* Main Content */
+        .main-container {
+            flex: 1;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, rgba(192,0,0,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(100px, -100px);
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, transparent 0%, rgba(192,0,0,0.1) 100%);
+            border-radius: 50%;
+            transform: translate(-50px, 50px);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #C00000, #ff3333);
+            -webkit-background-clip: text;  
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            height: 100%;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 30px rgba(192,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+        }
+
+        /* Buttons */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(192,0,0,0.2);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(192,0,0,0.3);
+            color: white;
+        }
+
+        .btn-outline-custom {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-custom:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(192,0,0,0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-logo {
+            max-width: 100px;
+            margin-bottom: 1rem;
+        }
+
+        .footer-title {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 0;
+            }
+            
+            .feature-card {
+                margin-bottom: 1.5rem;
+            }
+            
+            .footer {
+                text-align: center;
+            }
+            
+            .footer-title::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div class="spinner-overlay" id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="home.html">
+                <div class="position-relative me-3">
+                    <div style="width: 50px; height: 50px; background: var(--primary-color); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-school text-white fa-lg"></i>
+                    </div>
+                    <div style="position: absolute; bottom: -5px; right: -5px; width: 20px; height: 20px; background: var(--primary-dark); border-radius: 50%;"></div>
+                </div>
+                <div>
+                    <div class="fw-bold fs-5" style="color: var(--primary-color);">ระบบบันทึกการเรียนการสอน</div>
+                    <div class="text-muted fs-6">โรงเรียนสกลราชวิทยานุกูล</div>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="index.html">หน้าแรก</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="#features">ฟีเจอร์</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="#about">เกี่ยวกับ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="login.html">
+                            <i class="fas fa-sign-in-alt me-1"></i>เข้าสู่ระบบ
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 animate-fade-in-up">
+                    <h1 class="hero-title">ระบบบันทึกการเรียนการสอน</h1>
+                    <p class="hero-subtitle">
+                        ระบบดิจิทัลสำหรับบันทึกและติดตามการเรียนการสอนแบบเรียลไทม์ 
+                        พัฒนาขึ้นเพื่อโรงเรียนสกลราชวิทยานุกูล
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+                        <a href="login.html" class="btn btn-primary-custom animate-float">
+                            <i class="fas fa-rocket me-2"></i>เริ่มต้นใช้งานระบบ
+                        </a>
+                        <a href="#features" class="btn btn-outline-custom">
+                            <i class="fas fa-info-circle me-2"></i>เรียนรู้เพิ่มเติม
+                        </a>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <div class="d-flex flex-wrap gap-4">
+                            <div class="text-center">
+                                <div class="fs-3 fw-bold" style="color: var(--primary-color);">100%</div>
+                                <div class="text-muted">ความแม่นยำ</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="fs-3 fw-bold" style="color: var(--primary-color);">24/7</div>
+                                <div class="text-muted">ใช้งานได้ตลอด</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="fs-3 fw-bold" style="color: var(--primary-color);">0</div>
+                                <div class="text-muted">ข้อผิดพลาด</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 animate-fade-in-up">
+                    <div class="position-relative">
+                        <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                            <div class="card-body p-0">
+                                <div style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); padding: 2rem; color: white;">
+                                    <h4 class="fw-bold mb-3"><i class="fas fa-chart-line me-2"></i>แดชบอร์ดสรุปผล</h4>
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="fs-4 fw-bold">85</div>
+                                            <small>รายงานแล้ว</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fs-4 fw-bold">15</div>
+                                            <small>ยังไม่รายงาน</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fs-4 fw-bold">100</div>
+                                            <small>ทั้งหมด</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <canvas id="demoChart" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="position-absolute top-0 start-0 translate-middle" style="width: 60px; height: 60px; background: var(--primary-light); border-radius: 50%; opacity: 0.3;"></div>
+                        <div class="position-absolute bottom-0 end-0 translate-middle" style="width: 40px; height: 40px; background: var(--primary-color); border-radius: 50%; opacity: 0.3;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold" style="color: var(--primary-color);">ฟีเจอร์หลักของระบบ</h2>
+                <p class="text-muted">ระบบบันทึกการเรียนการสอนที่มีฟีเจอร์ครบครัน</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h4 class="fw-bold text-center mb-3">บันทึกการสอน</h4>
+                        <p class="text-center text-muted">
+                            บันทึกข้อมูลการเรียนการสอนรายคาบ แบบเรียลไทม์ 
+                            ด้วยระบบที่ง่ายต่อการใช้งาน
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4 class="fw-bold text-center mb-3">แดชบอร์ดวิเคราะห์</h4>
+                        <p class="text-center text-muted">
+                            แสดงสถิติและกราฟการรายงานแบบทันที 
+                            ติดตามผลได้ทุกช่วงเวลา
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h4 class="fw-bold text-center mb-3">แจ้งเตือนอัตโนมัติ</h4>
+                        <p class="text-center text-muted">
+                            ระบบแจ้งเตือนผ่าน LINE 
+                            เมื่อยังไม่รายงานการสอนภายในเวลาที่กำหนด
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h4 class="fw-bold text-center mb-3">รายงานย้อนหลัง</h4>
+                        <p class="text-center text-muted">
+                            สามารถรายงานย้อนหลังและดูประวัติการรายงาน
+                            พร้อมระบบค้นหาและกรองข้อมูล
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <h4 class="fw-bold text-center mb-3">จัดการผู้ใช้</h4>
+                        <p class="text-center text-muted">
+                            ระบบจัดการผู้ใช้หลายบทบาท 
+                            Admin, ครู, ตัวแทนห้องเรียน
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h4 class="fw-bold text-center mb-3">รองรับทุกอุปกรณ์</h4>
+                        <p class="text-center text-muted">
+                            ใช้งานได้ทั้งคอมพิวเตอร์ แท็บเล็ต 
+                            และโทรศัพท์มือถือ
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #fff5f5 100%);">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="fw-bold mb-4" style="color: var(--primary-color);">
+                        <i class="fas fa-graduation-cap me-2"></i>เกี่ยวกับโรงเรียน
+                    </h2>
+                    <p class="lead mb-5">
+                        โรงเรียนสกลราชวิทยานุกูล ก่อตั้งขึ้นในปี พ.ศ. 2455 
+                        ชื่อเดิมคือ "โรงเรียนวัดกลางรามวิทยา"
+                        เป็นโรงเรียนมัธยมศึกษาที่มีชื่อเสียงในจังหวัดสกลนคร 
+                        มุ่งเน้นการพัฒนาการศึกษาและส่งเสริมทักษะวิชาการให้กับนักเรียน
+                    </p>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary-custom p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-color); color: white;">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">นวัตกรรม</div>
+                                    <small class="text-muted">ระบบล้ำสมัย</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary-custom p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-color); color: white;">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">ปลอดภัย</div>
+                                    <small class="text-muted">ข้อมูลปลอดภัยตลอดเวลา</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary-custom p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-color); color: white;">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">รวดเร็ว</div>
+                                    <small class="text-muted">ใช้งานได้ทันทีและรวดเร็ว</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary-custom p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-color); color: white;">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">สนับสนุน</div>
+                                    <small class="text-muted">ช่วยเหลือตลอด 8 ชั่วโมง</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                        <div class="card-body p-4">
+                            <h4 class="fw-bold mb-4" style="color: var(--primary-color);">
+                                <i class="fas fa-calendar-check me-2"></i>ตารางการรายงาน
+                            </h4>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead style="background: var(--primary-color); color: white;">
+                                        <tr>
+                                            <th>วัน</th>
+                                            <th>เวลา</th>
+                                            <th>สถานะ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>จันทร์ - ศุกร์</td>
+                                            <td>08:00 - 16:30 น.</td>
+                                            <td><span class="badge bg-success">ปกติ</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>เสาร์</td>
+                                            <td>08:00 - 12:00 น.</td>
+                                            <td><span class="badge bg-warning">ครึ่งวัน</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>อาทิตย์</td>
+                                            <td>ปิดทำการ</td>
+                                            <td><span class="badge bg-danger">ปิด</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="alert alert-info mt-3 mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>แจ้งเตือน:</strong> กรุณารายงานการสอนให้เสร็จสิ้นภายในเวลา 17:30 น. ของทุกวัน
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="d-flex align-items-center mb-3">
+                        <div style="width: 40px; height: 40px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                            <i class="fas fa-school" style="color: var(--primary-color);"></i>
+                        </div>
+                        <h5 class="footer-title mb-0">โรงเรียนสกลราชวิทยานุกูล</h5>
+                    </div>
+                    <p class="text-light" style="opacity: 0.8;">
+                        ระบบบันทึกการเรียนการสอนดิจิทัล 
+                        ที่พัฒนาขึ้นเพื่อเพิ่มประสิทธิภาพในการจัดการเรียนการสอน
+                    </p>
+                    <div class="d-flex gap-3 mt-4">
+                        <a href="#" class="text-light" style="opacity: 0.8; font-size: 1.2rem;">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-light" style="opacity: 0.8; font-size: 1.2rem;">
+                            <i class="fab fa-line"></i>
+                        </a>
+                        <a href="#" class="text-light" style="opacity: 0.8; font-size: 1.2rem;">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                    <h5 class="footer-title">เมนูหลัก</h5>
+                    <ul class="footer-links">
+                        <li><a href="index.html">หน้าแรก</a></li>
+                        <li><a href="login.html">เข้าสู่ระบบ</a></li>
+                        <li><a href="#features">ฟีเจอร์</a></li>
+                        <li><a href="#about">เกี่ยวกับ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="footer-title">ระบบงาน</h5>
+                    <ul class="footer-links">
+                        <li><a href="dashboard_admin.html">แดชบอร์ดแอดมิน</a></li>
+                        <li><a href="manage_users.html">จัดการผู้ใช้</a></li>
+                        <li><a href="dashboard_teacher.html">แดชบอร์ดครู</a></li>
+                        <li><a href="report.html">บันทึกการสอน</a></li>
+                        <li><a href="history.html">ประวัติรายงาน</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3">
+                    <h5 class="footer-title">ติดต่อเรา</h5>
+                    <ul class="footer-links">
+                        <li>
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            เลขที่ 74/26 ถนนใสสว่าง ตำบลธาตุเชิงชุม
+อำเภอเมือง จังหวัดสกลนคร
+47000
+                        </li>
+                        <li>
+                            <i class="fas fa-phone me-2"></i>
+                            042-123456
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope me-2"></i>
+                            info@sakonnakhon-school.ac.th
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="mb-0" style="opacity: 0.7;">
+                    <i class="fas fa-code me-1"></i>
+                    พัฒนาโดยฝ่ายบริหารงานวิชาการ  โรงเรียนสกลราชวิทยานุกูล
+                </p>
+                <p class="mb-0 mt-2" style="opacity: 0.7; font-size: 0.9rem;">
+                    © 2024 โรงเรียนสกลราชวิทยานุกูล
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- JavaScript ในหน้าเดียวกัน -->
+    <script>
+        // Initialize demo chart
+        document.addEventListener('DOMContentLoaded', function() {
+            // Demo Chart
+            const ctx = document.getElementById('demoChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ม.1', 'ม.2', 'ม.3', 'ม.4', 'ม.5', 'ม.6'],
+                    datasets: [{
+                        label: 'จำนวนรายงาน',
+                        data: [85, 92, 78, 88, 95, 82],
+                        backgroundColor: [
+                            'rgba(192, 0, 0, 0.7)',
+                            'rgba(220, 53, 69, 0.7)',
+                            'rgba(255, 77, 77, 0.7)',
+                            'rgba(255, 107, 107, 0.7)',
+                            'rgba(255, 138, 138, 0.7)',
+                            'rgba(255, 168, 168, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(192, 0, 0)',
+                            'rgb(220, 53, 69)',
+                            'rgb(255, 77, 77)',
+                            'rgb(255, 107, 107)',
+                            'rgb(255, 138, 138)',
+                            'rgb(255, 168, 168)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                } else {
+                    navbar.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                }
+            });
+
+            // Check if user is already logged in
+            const user = localStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                const loginLink = document.querySelector('a[href="login.html"]');
+                if (loginLink) {
+                    loginLink.innerHTML = '<i class="fas fa-user me-1"></i>' + userData.fullname;
+                    loginLink.href = userData.role === 'admin' ? 'dashboard_admin.html' : 
+                                     userData.role === 'teacher' ? 'dashboard_teacher.html' : 
+                                     'dashboard_student.html';
+                }
+            }
+
+            // Loading spinner functions
+            window.showLoading = function() {
+                document.getElementById('loadingSpinner').style.display = 'flex';
+            };
+
+            window.hideLoading = function() {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            };
+
+            // Utility function for showing alerts
+            window.showAlert = function(title, message, type = 'success') {
+                Swal.fire({
+                    title: title,
+                    text: message,
+                    icon: type,
+                    confirmButtonColor: '#C00000'
+                });
+            };
+        });
+
+        // PWA Installation
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(
+                    function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    },
+                    function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    }
+                );
+            });
+        }
+
+        // Check for PWA install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button if not already installed
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            if (!isStandalone) {
+                setTimeout(() => {
+                    Swal.fire({
+                        title: 'ติดตั้งแอปพลิเคชัน',
+                        text: 'ต้องการติดตั้งแอปพลิเคชันระบบบันทึกการสอนลงในอุปกรณ์ของคุณหรือไม่?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'ติดตั้ง',
+                        cancelButtonText: 'ไว้คราวหน้า',
+                        confirmButtonColor: '#C00000'
+                    }).then((result) => {
+                        if (result.isConfirmed && deferredPrompt) {
+                            deferredPrompt.prompt();
+                            deferredPrompt.userChoice.then((choiceResult) => {
+                                if (choiceResult.outcome === 'accepted') {
+                                    console.log('User accepted the install prompt');
+                                }
+                                deferredPrompt = null;
+                            });
+                        }
+                    });
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

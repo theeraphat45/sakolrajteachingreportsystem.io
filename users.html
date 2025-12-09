@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการผู้ใช้ | โรงเรียนสกลราชวิทยานุกูล</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-red: #C00000;
+            --secondary-red: #D32F2F;
+            --light-red: #FFEBEE;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --dark-gray: #495057;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+        }
+        
+        .bg-school-red {
+            background-color: var(--primary-red) !important;
+        }
+        
+        .text-school-red {
+            color: var(--primary-red) !important;
+        }
+        
+        .btn-school-red {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+        }
+        
+        .btn-school-red:hover {
+            background-color: var(--secondary-red);
+            color: white;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .management-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .user-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary-red);
+            transition: all 0.3s;
+        }
+        
+        .user-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            background-color: var(--white);
+            border-top: 1px solid #dee2e6;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+        
+        .table-users {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .table-users thead {
+            background-color: var(--primary-red);
+            color: white;
+        }
+        
+        .badge-role {
+            font-size: 0.8em;
+            padding: 5px 10px;
+        }
+        
+        .badge-admin { background-color: #C00000; color: white; }
+        .badge-teacher { background-color: #0d6efd; color: white; }
+        .badge-student { background-color: #198754; color: white; }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box .form-control {
+            padding-left: 40px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #6c757d;
+        }
+        
+        .action-buttons .btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-red);
+            font-weight: bold;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .status-online { background-color: #198754; }
+        .status-offline { background-color: #6c757d; }
+        .status-away { background-color: #ffc107; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="dashboard_admin.html">
+                <img src="assets/logo.png" alt="Logo" class="me-2">
+                <div>
+                    <div class="fw-bold text-school-red" style="line-height: 1.2;">ระบบบันทึกการเรียนการสอน</div>
+                    <small class="text-muted">โรงเรียนสกลราชวิทยานุกูล</small>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-2 text-school-red"></i>
+                            <span id="userName">ผู้ดูแลระบบ</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person me-2"></i>โปรไฟล์</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i>ออกจากระบบ</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-school-red mb-1">จัดการผู้ใช้งานระบบ</h2>
+                    <p class="text-muted">เพิ่ม แก้ไข ลบ ข้อมูลผู้ใช้ทั้งหมด</p>
+                </div>
+                <div>
+                    <button class="btn btn-school-red" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="bi bi-person-plus me-2"></i>เพิ่มผู้ใช้ใหม่
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search and Filter -->
+            <div class="management-card">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text" class="form-control" placeholder="ค้นหาผู้ใช้งาน..." id="searchUser">
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" id="filterRole">
+                            <option value="all">ทุกบทบาท</option>
+                            <option value="admin">ผู้ดูแลระบบ</option>
+                            <option value="teacher">ครูผู้สอน</option>
+                            <option value="student">ตัวแทนนักเรียน</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" id="filterStatus">
+                            <option value="all">ทุกสถานะ</option>
+                            <option value="active">ใช้งานอยู่</option>
+                            <option value="inactive">ไม่ได้ใช้งาน</option>
+                            <option value="pending">รออนุมัติ</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-school-red">รายชื่อผู้ใช้งานทั้งหมด</h5>
+                    <span class="badge bg-school-red" id="userCount">135 ผู้ใช้</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-users mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>ผู้ใช้งาน</th>
+                                    <th>บทบาท</th>
+                                    <th>อีเมล/ผู้ใช้</th>
+                                    <th>ห้อง/แผนก</th>
+                                    <th>สถานะ</th>
+                                    <th>ใช้งานล่าสุด</th>
+                                    <th>การดำเนินการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <!-- Admin Users -->
+                                <tr>
+                                    <td>1</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">A</div>
+                                            <div>
+                                                <div class="fw-bold">ผู้ดูแลระบบ</div>
+                                                <small class="text-muted">System Administrator</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-role badge-admin">ผู้ดูแลระบบ</span></td>
+                                    <td>admin@sakonnakhon.ac.th</td>
+                                    <td>งานวิชาการ</td>
+                                    <td>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="text-success">ออนไลน์</span>
+                                    </td>
+                                    <td>20/11/2024 10:30</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red" data-bs-toggle="modal" data-bs-target="#editUserModal">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('ผู้ดูแลระบบ')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Teacher Users -->
+                                <tr>
+                                    <td>2</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">ว</div>
+                                            <div>
+                                                <div class="fw-bold">คุณครูวีระพล สุวรรณชัยรบ</div>
+                                                <small class="text-muted">ครูผู้สอน</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-role badge-teacher">ครูผู้สอน</span></td>
+                                    <td>weerapol@skr.ac.th</td>
+                                    <td>ม.5/2, ม.6/1</td>
+                                    <td>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="text-success">ออนไลน์</span>
+                                    </td>
+                                    <td>20/11/2024 09:15</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>3</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">ร</div>
+                                            <div>
+                                                <div class="fw-bold">คุณครูรุจิพัชญ์ อรุวีวัฒนานนท์</div>
+                                                <small class="text-muted">ครูผู้สอน</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-role badge-teacher">ครูผู้สอน</span></td>
+                                    <td>rujipat@skr.ac.th</td>
+                                    <td>ม.3/4, ม.2/5</td>
+                                    <td>
+                                        <span class="status-indicator status-away"></span>
+                                        <span class="text-warning">อยู่แต่ไม่ว่าง</span>
+                                    </td>
+                                    <td>20/11/2024 08:45</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>4</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">ผ</div>
+                                            <div>
+                                                <div class="fw-bold">คุณครูผุสดี บุญหงษ์</div>
+                                                <small class="text-muted">ครูผู้สอน</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-role badge-teacher">ครูผู้สอน</span></td>
+                                    <td>phusdee@skr.ac.th</td>
+                                    <td>ม.4/1, ม.6/3</td>
+                                    <td>
+                                        <span class="status-indicator status-offline"></span>
+                                        <span class="text-muted">ออฟไลน์</span>
+                                    </td>
+                                    <td>19/11/2024 16:20</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Student Users -->
+                                <tr>
+                                    <td>5</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">น</div>
+                                            <div>
+                                                <div class="fw-bold">นักเรียน ม.5/2</div>
+                                                <small class="text-muted">ตัวแทนนักเรียน</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-role badge-student">ตัวแทนนักเรียน</span></td>
+                                    <td>student_m5_2@skr.ac.th</td>
+                                    <td>ม.5/2</td>
+                                    <td>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="text-success">ออนไลน์</span>
+                                    </td>
+                                    <td>20/11/2024 11:45</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>6</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">น</div>
+                                            <div>
+                                                <div class="fw-bold">นักเรียน ม.6/1</div>
+                                                <small class="text-muted">ตัวแทนนักเรียน</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-role badge-student">ตัวแทนนักเรียน</span></td>
+                                    <td>student_m6_1@skr.ac.th</td>
+                                    <td>ม.6/1</td>
+                                    <td>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="text-success">ออนไลน์</span>
+                                    </td>
+                                    <td>20/11/2024 10:20</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>7</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">น</div>
+                                            <div>
+                                                <div class="fw-bold">นักเรียน ม.4/3</div>
+                                                <div class="text-muted small">ตัวแทนนักเรียน</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-role badge-student">ตัวแทนนักเรียน</span></td>
+                                    <td>student_m4_3@skr.ac.th</td>
+                                    <td>ม.4/3</td>
+                                    <td>
+                                        <span class="status-indicator status-offline"></span>
+                                        <span class="text-muted">ออฟไลน์</span>
+                                    </td>
+                                    <td>19/11/2024 13:05</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>8</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">น</div>
+                                            <div>
+                                                <div class="fw-bold">นักเรียน ม.3/1</div>
+                                                <div class="text-muted small">ตัวแทนนักเรียน</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-role badge-student">ตัวแทนนักเรียน</span></td>
+                                    <td>student_m3_1@skr.ac.th</td>
+                                    <td>ม.3/1</td>
+                                    <td>
+                                        <span class="status-indicator status-away"></span>
+                                        <span class="text-warning">อยู่แต่ไม่ว่าง</span>
+                                    </td>
+                                    <td>18/11/2024 15:30</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <p class="mb-0 text-muted">แสดง 1-8 จาก 135 รายการ</p>
+                        </div>
+                        <div class="col-md-6">
+                            <nav aria-label="Page navigation" class="float-md-end">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#">ก่อนหน้า</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">ถัดไป</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Statistics -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="management-card">
+                        <h5 class="fw-bold text-school-red mb-3">
+                            <i class="bi bi-people me-2"></i>สรุปผู้ใช้ตามบทบาท
+                        </h5>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                ครูผู้สอน
+                                <span class="badge bg-primary rounded-pill">82 คน</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                ตัวแทนนักเรียน
+                                <span class="badge bg-success rounded-pill">52 คน</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                ผู้ดูแลระบบ
+                                <span class="badge bg-danger rounded-pill">1 คน</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="management-card">
+                        <h5 class="fw-bold text-school-red mb-3">
+                            <i class="bi bi-bar-chart me-2"></i>สถานะการใช้งาน
+                        </h5>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><span class="status-indicator status-online"></span> ออนไลน์</span>
+                                <span class="badge bg-success rounded-pill">45 คน</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><span class="status-indicator status-offline"></span> ออฟไลน์</span>
+                                <span class="badge bg-secondary rounded-pill">78 คน</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><span class="status-indicator status-away"></span> อยู่แต่ไม่ว่าง</span>
+                                <span class="badge bg-warning rounded-pill">12 คน</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="management-card">
+                        <h5 class="fw-bold text-school-red mb-3">
+                            <i class="bi bi-calendar-check me-2"></i>การใช้งานล่าสุด
+                        </h5>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                วันนี้
+                                <span class="badge bg-school-red rounded-pill">28 คน</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                ภายใน 7 วัน
+                                <span class="badge bg-info rounded-pill">112 คน</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                ไม่ได้ใช้งานเกิน 30 วัน
+                                <span class="badge bg-warning rounded-pill">8 คน</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">พัฒนาโดยฝ่ายบริหารงานวิชาการ โรงเรียนสกลราชวิทยานุกูล</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 text-muted">© 2024 สงวนลิขสิทธิ์</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-school-red">
+                        <i class="bi bi-person-plus me-2"></i>เพิ่มผู้ใช้งานใหม่
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addUserForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ชื่อ-นามสกุล</label>
+                                <input type="text" class="form-control" id="userFullName" placeholder="เช่น วีระพล สุวรรณชัยรบ" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">บทบาท</label>
+                                <select class="form-select" id="userRole" required>
+                                    <option value="">เลือกบทบาท</option>
+                                    <option value="admin">ผู้ดูแลระบบ</option>
+                                    <option value="teacher">ครูผู้สอน</option>
+                                    <option value="student">ตัวแทนนักเรียน</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ชื่อผู้ใช้</label>
+                                <input type="text" class="form-control" id="username" placeholder="เช่น weerapol" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">รหัสผ่านเริ่มต้น</label>
+                                <input type="text" class="form-control" id="password" value="skr12345" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">อีเมล</label>
+                                <input type="email" class="form-control" id="userEmail" placeholder="เช่น weerapol@skr.ac.th" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">โทรศัพท์</label>
+                                <input type="tel" class="form-control" id="userPhone" placeholder="เช่น 081-234-5678">
+                            </div>
+                            <div class="col-md-6 mb-3" id="teacherClassField">
+                                <label class="form-label">ห้อง/แผนก</label>
+                                <input type="text" class="form-control" id="teacherClass" placeholder="เช่น ม.5/2, ม.6/1">
+                            </div>
+                            <div class="col-md-6 mb-3" id="studentClassField" style="display: none;">
+                                <label class="form-label">ห้องเรียน</label>
+                                <select class="form-select" id="studentClass">
+                                    <option value="">เลือกห้องเรียน</option>
+                                    <option value="ม.1/1">ม.1/1</option>
+                                    <option value="ม.1/2">ม.1/2</option>
+                                    <option value="ม.1/3">ม.1/3</option>
+                                    <option value="ม.2/1">ม.2/1</option>
+                                    <option value="ม.2/2">ม.2/2</option>
+                                    <option value="ม.2/3">ม.2/3</option>
+                                    <option value="ม.3/1">ม.3/1</option>
+                                    <option value="ม.3/2">ม.3/2</option>
+                                    <option value="ม.3/3">ม.3/3</option>
+                                    <option value="ม.4/1">ม.4/1</option>
+                                    <option value="ม.4/2">ม.4/2</option>
+                                    <option value="ม.4/3">ม.4/3</option>
+                                    <option value="ม.5/1">ม.5/1</option>
+                                    <option value="ม.5/2">ม.5/2</option>
+                                    <option value="ม.5/3">ม.5/3</option>
+                                    <option value="ม.6/1">ม.6/1</option>
+                                    <option value="ม.6/2">ม.6/2</option>
+                                    <option value="ม.6/3">ม.6/3</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">หมายเหตุ</label>
+                                <textarea class="form-control" id="userNote" rows="2" placeholder="หมายเหตุเพิ่มเติม..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-school-red">เพิ่มผู้ใช้งาน</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-school-red">
+                        <i class="bi bi-pencil me-2"></i>แก้ไขข้อมูลผู้ใช้งาน
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editUserForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ชื่อ-นามสกุล</label>
+                                <input type="text" class="form-control" id="editUserFullName" value="ผู้ดูแลระบบ" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">บทบาท</label>
+                                <select class="form-select" id="editUserRole" required>
+                                    <option value="admin" selected>ผู้ดูแลระบบ</option>
+                                    <option value="teacher">ครูผู้สอน</option>
+                                    <option value="student">ตัวแทนนักเรียน</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ชื่อผู้ใช้</label>
+                                <input type="text" class="form-control" id="editUsername" value="admin" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">รีเซ็ตรหัสผ่าน</label>
+                                <input type="text" class="form-control" id="editPassword" placeholder="เว้นว่างหากไม่ต้องการเปลี่ยน">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">อีเมล</label>
+                                <input type="email" class="form-control" id="editUserEmail" value="admin@sakonnakhon.ac.th" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">โทรศัพท์</label>
+                                <input type="tel" class="form-control" id="editUserPhone" placeholder="เช่น 081-234-5678">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">สถานะ</label>
+                                <select class="form-select" id="editUserStatus" required>
+                                    <option value="active" selected>ใช้งานอยู่</option>
+                                    <option value="inactive">ไม่ได้ใช้งาน</option>
+                                    <option value="pending">รออนุมัติ</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">หมายเหตุ</label>
+                                <textarea class="form-control" id="editUserNote" rows="2">ผู้ดูแลระบบหลัก</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-school-red">บันทึกการเปลี่ยนแปลง</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check session
+            const session = localStorage.getItem('userSession');
+            if (!session) {
+                window.location.href = 'login.html';
+            } else {
+                const userData = JSON.parse(session);
+                if (userData.role !== 'admin') {
+                    alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+                    window.location.href = 'login.html';
+                } else {
+                    document.getElementById('userName').textContent = userData.name;
+                }
+            }
+            
+            // Search functionality
+            document.getElementById('searchUser').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#usersTable tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Filter functionality
+            document.getElementById('filterRole').addEventListener('change', applyFilters);
+            document.getElementById('filterStatus').addEventListener('change', applyFilters);
+            
+            function applyFilters() {
+                const role = document.getElementById('filterRole').value;
+                const status = document.getElementById('filterStatus').value;
+                
+                // In a real app, this would filter the data
+                console.log('Filtering by:', {role, status});
+            }
+            
+            // Show/hide fields based on role
+            document.getElementById('userRole').addEventListener('change', function() {
+                const role = this.value;
+                const teacherField = document.getElementById('teacherClassField');
+                const studentField = document.getElementById('studentClassField');
+                
+                if (role === 'teacher') {
+                    teacherField.style.display = 'block';
+                    studentField.style.display = 'none';
+                } else if (role === 'student') {
+                    teacherField.style.display = 'none';
+                    studentField.style.display = 'block';
+                } else {
+                    teacherField.style.display = 'none';
+                    studentField.style.display = 'none';
+                }
+            });
+            
+            // Add user form
+            document.getElementById('addUserForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real app, this would send data to the server
+                alert('เพิ่มผู้ใช้งานเรียบร้อยแล้ว');
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                modal.hide();
+                
+                // Reset form
+                this.reset();
+            });
+            
+            // Edit user form
+            document.getElementById('editUserForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real app, this would send data to the server
+                alert('บันทึกการเปลี่ยนแปลงเรียบร้อยแล้ว');
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                modal.hide();
+            });
+            
+            // Delete user
+            window.confirmDelete = function(userName) {
+                if (confirm(`คุณต้องการลบผู้ใช้งาน "${userName}" ใช่หรือไม่?`)) {
+                    alert(`ลบผู้ใช้งาน "${userName}" เรียบร้อยแล้ว`);
+                    // In a real app, this would send delete request to the server
+                }
+            };
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
+                    localStorage.removeItem('userSession');
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

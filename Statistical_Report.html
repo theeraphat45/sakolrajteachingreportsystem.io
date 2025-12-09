@@ -1,0 +1,2748 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สถิติและรายงานการเรียนการสอน - โรงเรียนสกลราชวิทยานุกูล</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        :root {
+            --primary-red: #C00000;
+            --secondary-red: #E60000;
+            --light-red: #FFF5F5;
+            --light-bg: #F8F9FA;
+            --white: #FFFFFF;
+            --success: #198754;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+        }
+        
+        body {
+            font-family: 'Sarabun', 'Prompt', sans-serif;
+            background-color: var(--light-bg);
+            color: #333;
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .sidebar {
+            background-color: var(--white);
+            min-height: calc(100vh - 56px);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: #333;
+            padding: 12px 20px;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: var(--light-bg);
+            border-left-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-red);
+            color: white;
+            font-weight: 500;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+        
+        .btn-primary:hover {
+            background-color: #A00000;
+            border-color: #A00000;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 25px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: var(--primary-red);
+        }
+        
+        .stat-card .number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--primary-red);
+            line-height: 1;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+        
+        .stat-card .sub-label {
+            color: #999;
+            font-size: 0.8em;
+        }
+        
+        .filter-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-mini-container {
+            position: relative;
+            height: 200px;
+            margin-bottom: 15px;
+        }
+        
+        .table th {
+            background-color: var(--light-bg);
+            font-weight: 600;
+        }
+        
+        .grade-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .badge-m1 { background-color: #6f42c1; color: white; }
+        .badge-m2 { background-color: #20c997; color: white; }
+        .badge-m3 { background-color: #fd7e14; color: white; }
+        .badge-m4 { background-color: var(--primary-red); color: white; }
+        .badge-m5 { background-color: #0dcaf0; color: white; }
+        .badge-m6 { background-color: #6c757d; color: white; }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .status-normal { background-color: var(--success); color: white; }
+        .status-substitute { background-color: var(--warning); color: black; }
+        .status-absent { background-color: var(--danger); color: white; }
+        .status-activity { background-color: var(--info); color: white; }
+        
+        .progress-thin {
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .teacher-card {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .teacher-card:hover {
+            border-color: var(--primary-red);
+            box-shadow: 0 5px 15px rgba(192, 0, 0, 0.1);
+        }
+        
+        .kpi-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .kpi-excellent { background-color: #28a745; }
+        .kpi-good { background-color: #20c997; }
+        .kpi-fair { background-color: #ffc107; }
+        .kpi-poor { background-color: #dc3545; }
+        
+        .tab-content {
+            background: white;
+            border-radius: 0 0 10px 10px;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #666;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-red);
+            border-bottom: 3px solid var(--primary-red);
+            background-color: transparent;
+        }
+        
+        .report-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .report-section:last-child {
+            border-bottom: none;
+        }
+        
+        .print-only {
+            display: none;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+            .tab-content {
+                border: 1px solid #ddd !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm no-print">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="assets/logo.png" alt="โรงเรียนสกลราชวิทยานุกูล">
+                <span class="fw-bold" style="color: var(--primary-red);">ระบบบันทึกการเรียนการสอน<br><small>โรงเรียนสกลราชวิทยานุกูล</small></span>
+            </a>
+            <div class="navbar-nav ms-auto align-items-center">
+                <span class="nav-item me-3">
+                    <span id="navbarUser"></span>
+                    <span class="role-badge" id="userRoleBadge"></span>
+                </span>
+                <a href="#" id="dashboardLink" class="nav-link me-3">
+                    <i class="bi bi-speedometer2"></i> แดชบอร์ด
+                </a>
+                <a href="#" id="logoutBtn" class="nav-link btn btn-outline-danger">
+                    <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Print Header (Visible only when printing) -->
+    <div class="print-only container-fluid mb-4">
+        <div class="row">
+            <div class="col-12 text-center">
+                <img src="assets/logo.png" alt="โรงเรียนสกลราชวิทยานุกูล" style="height: 60px;">
+                <h3 class="mt-2">โรงเรียนสกลราชวิทยานุกูล</h3>
+                <h4>สถิติและรายงานการเรียนการสอน</h4>
+                <p>รายงานวันที่: <span id="printDate"></span></p>
+                <hr>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 col-lg-2 d-md-block sidebar collapse p-0 no-print">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="dashboardNavLink">
+                                <i class="bi bi-speedometer2 me-2"></i> แดชบอร์ด
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="report.html">
+                                <i class="bi bi-clipboard-check me-2"></i> รายงานการสอน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="history.html">
+                                <i class="bi bi-clock-history me-2"></i> ประวัติรายงาน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="statistical_report.html">
+                                <i class="bi bi-graph-up me-2"></i> สถิติและรายงาน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="teacher_absence.html">
+                                <i class="bi bi-person-dash me-2"></i> สถิติครูขาดสอน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.html">
+                                <i class="bi bi-person-circle me-2"></i> โปรไฟล์
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="retrospective.html">
+                                <i class="bi bi-calendar-month me-2"></i> รายงานประจำเดือน
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 col-lg-10 ms-sm-auto px-md-4">
+                <!-- Header -->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom no-print">
+                    <h1 class="h2"><i class="bi bi-graph-up me-2"></i> สถิติและรายงานการเรียนการสอน</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="generatePDF()">
+                                <i class="bi bi-file-earmark-pdf"></i> PDF
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success" onclick="exportExcel()">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                                <i class="bi bi-printer"></i> พิมพ์
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="refreshData()">
+                            <i class="bi bi-arrow-clockwise"></i> รีเฟรช
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-card no-print">
+                    <h5><i class="bi bi-funnel me-2"></i> กรองข้อมูลสถิติ</h5>
+                    <form id="filterForm">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="reportPeriod" class="form-label">ช่วงเวลารายงาน</label>
+                                <select class="form-select" id="reportPeriod">
+                                    <option value="today">วันนี้</option>
+                                    <option value="yesterday">เมื่อวาน</option>
+                                    <option value="week">สัปดาห์นี้</option>
+                                    <option value="lastweek">สัปดาห์ที่แล้ว</option>
+                                    <option value="month" selected>เดือนนี้</option>
+                                    <option value="lastmonth">เดือนที่แล้ว</option>
+                                    <option value="term">ภาคเรียนนี้</option>
+                                    <option value="lastterm">ภาคเรียนที่แล้ว</option>
+                                    <option value="year">ปีการศึกษานี้</option>
+                                    <option value="custom">กำหนดเอง</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="startDate" class="form-label">วันที่เริ่ม</label>
+                                <input type="date" class="form-control" id="startDate">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="endDate" class="form-label">วันที่สิ้นสุด</label>
+                                <input type="date" class="form-control" id="endDate">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="gradeLevel" class="form-label">ระดับชั้น</label>
+                                <select class="form-select" id="gradeLevel">
+                                    <option value="">ทั้งหมด</option>
+                                    <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
+                                    <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
+                                    <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
+                                    <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
+                                    <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
+                                    <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="bi bi-search"></i> แสดงข้อมูล
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="resetFilters()">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs no-print" id="reportTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">
+                            <i class="bi bi-house-door me-1"></i> สรุปภาพรวม
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab">
+                            <i class="bi bi-calendar-check me-1"></i> สถิติการเข้าเรียน
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="teacher-tab" data-bs-toggle="tab" data-bs-target="#teacher" type="button" role="tab">
+                            <i class="bi bi-person-badge me-1"></i> ประสิทธิภาพครู
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="classroom-tab" data-bs-toggle="tab" data-bs-target="#classroom" type="button" role="tab">
+                            <i class="bi bi-building me-1"></i> สถิติห้องเรียน
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="subject-tab" data-bs-toggle="tab" data-bs-target="#subject" type="button" role="tab">
+                            <i class="bi bi-book me-1"></i> สถิติรายวิชา
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="detailed-tab" data-bs-toggle="tab" data-bs-target="#detailed" type="button" role="tab">
+                            <i class="bi bi-table me-1"></i> รายงานละเอียด
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="reportTabsContent">
+                    <!-- Tab 1: Summary -->
+                    <div class="tab-pane fade show active" id="summary" role="tabpanel">
+                        <!-- Summary Statistics -->
+                        <div class="report-section">
+                            <h4><i class="bi bi-bar-chart me-2"></i> สรุปสถิติภาพรวม</h4>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-calendar-check"></i>
+                                        <div class="number" id="totalClasses">0</div>
+                                        <div class="label">จำนวนคาบเรียนทั้งหมด</div>
+                                        <div class="sub-label" id="totalClassesPeriod"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-person-check"></i>
+                                        <div class="number" id="attendanceRate">0%</div>
+                                        <div class="label">อัตราการเข้าเรียน</div>
+                                        <div class="sub-label">เฉลี่ยทั้งโรงเรียน</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-person-dash"></i>
+                                        <div class="number" id="absenceRate">0%</div>
+                                        <div class="label">อัตราการขาดเรียน</div>
+                                        <div class="sub-label">ครูขาดสอน/ไม่มีผู้สอน</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-clock"></i>
+                                        <div class="number" id="avgReportTime">0</div>
+                                        <div class="label">เวลารายงานเฉลี่ย</div>
+                                        <div class="sub-label">หลังเริ่มคาบเรียน</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row 1 -->
+                        <div class="report-section">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5><i class="bi bi-graph-up me-2"></i> อัตราการเข้าเรียนรายสัปดาห์</h5>
+                                    <div class="chart-container">
+                                        <canvas id="weeklyAttendanceChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h5><i class="bi bi-pie-chart me-2"></i> สถานะการสอน</h5>
+                                    <div class="chart-container">
+                                        <canvas id="teachingStatusChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row 2 -->
+                        <div class="report-section">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5><i class="bi bi-building me-2"></i> อัตราการรายงานแยกระดับชั้น</h5>
+                                    <div class="chart-container">
+                                        <canvas id="gradeReportChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5><i class="bi bi-clock-history me-2"></i> เวลารายงานเฉลี่ย</h5>
+                                    <div class="chart-container">
+                                        <canvas id="reportTimeChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary Table -->
+                        <div class="report-section">
+                            <h5><i class="bi bi-table me-2"></i> สรุปสถิติแยกระดับชั้น</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ระดับชั้น</th>
+                                            <th>จำนวนห้อง</th>
+                                            <th>คาบเรียนทั้งหมด</th>
+                                            <th>สอนปกติ</th>
+                                            <th>ผู้สอนแทน</th>
+                                            <th>ไม่มีผู้สอน</th>
+                                            <th>กิจกรรม</th>
+                                            <th>อัตราการเข้าเรียน</th>
+                                            <th>KPI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gradeSummaryTable">
+                                        <!-- Data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Attendance Statistics -->
+                    <div class="tab-pane fade" id="attendance" role="tabpanel">
+                        <div class="report-section">
+                            <h4><i class="bi bi-calendar-check me-2"></i> สถิติการเข้าเรียน</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="chart-container">
+                                        <canvas id="attendanceTrendChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="chart-container">
+                                        <canvas id="absenceReasonChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section">
+                            <h5><i class="bi bi-calendar-week me-2"></i> สถิติการเข้าเรียนรายวัน</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>วันที่</th>
+                                            <th>วัน</th>
+                                            <th>คาบเรียนทั้งหมด</th>
+                                            <th>สอนปกติ</th>
+                                            <th>ผู้สอนแทน</th>
+                                            <th>ไม่มีผู้สอน</th>
+                                            <th>กิจกรรม</th>
+                                            <th>อัตราการเข้าเรียน</th>
+                                            <th>แนวโน้ม</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dailyAttendanceTable">
+                                        <!-- Data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="report-section">
+                            <h5><i class="bi bi-clock me-2"></i> สถิติตามช่วงเวลา</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="chart-mini-container">
+                                        <canvas id="periodAttendanceChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="chart-mini-container">
+                                        <canvas id="timeOfDayChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="chart-mini-container">
+                                        <canvas id="dayOfWeekChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Teacher Performance -->
+                    <div class="tab-pane fade" id="teacher" role="tabpanel">
+                        <div class="report-section">
+                            <h4><i class="bi bi-person-badge me-2"></i> ประสิทธิภาพครูผู้สอน</h4>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-person"></i>
+                                        <div class="number" id="totalTeachers">0</div>
+                                        <div class="label">จำนวนครูผู้สอนทั้งหมด</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-person-check"></i>
+                                        <div class="number" id="teacherAttendanceRate">0%</div>
+                                        <div class="label">อัตราการสอนปกติ</div>
+                                        <div class="sub-label">เฉลี่ยครูผู้สอน</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-person-dash"></i>
+                                        <div class="number" id="teacherAbsenceRate">0%</div>
+                                        <div class="label">อัตราการขาดสอน</div>
+                                        <div class="sub-label">เฉลี่ยครูผู้สอน</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-clock-history"></i>
+                                        <div class="number" id="substituteRate">0%</div>
+                                        <div class="label">อัตราการสอนแทน</div>
+                                        <div class="sub-label">เฉลี่ยครูผู้สอน</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Teacher Performance Chart -->
+                        <div class="report-section">
+                            <h5><i class="bi bi-graph-up me-2"></i> ประสิทธิภาพครูผู้สอน</h5>
+                            <div class="chart-container">
+                                <canvas id="teacherPerformanceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Teacher Performance Table -->
+                        <div class="report-section">
+                            <h5><i class="bi bi-table me-2"></i> รายงานประสิทธิภาพครูผู้สอน</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ครูผู้สอน</th>
+                                            <th>ระดับชั้น</th>
+                                            <th>วิชาที่สอน</th>
+                                            <th>คาบทั้งหมด</th>
+                                            <th>สอนปกติ</th>
+                                            <th>สอนแทน</th>
+                                            <th>ขาดสอน</th>
+                                            <th>อัตราการสอน</th>
+                                            <th>เปอร์เซ็นต์</th>
+                                            <th>KPI</th>
+                                            <th>รายละเอียด</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="teacherPerformanceTable">
+                                        <!-- Data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Top/Bottom Teachers -->
+                        <div class="report-section">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5><i class="bi bi-trophy me-2"></i> ครูที่มีอัตราการสอนสูงสุด</h5>
+                                    <div id="topTeachersList">
+                                        <!-- Top teachers will be populated here -->
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5><i class="bi bi-exclamation-triangle me-2"></i> ครูที่ต้องดูแลเป็นพิเศษ</h5>
+                                    <div id="bottomTeachersList">
+                                        <!-- Bottom teachers will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Classroom Statistics -->
+                    <div class="tab-pane fade" id="classroom" role="tabpanel">
+                        <div class="report-section">
+                            <h4><i class="bi bi-building me-2"></i> สถิติห้องเรียน</h4>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stat-card">
+                                        <i class="bi bi-door-closed"></i>
+                                        <div class="number" id="totalClassrooms">0</div>
+                                        <div class="label">จำนวนห้องเรียนทั้งหมด</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-card">
+                                        <i class="bi bi-check-circle"></i>
+                                        <div class="number" id="reportedClassrooms">0</div>
+                                        <div class="label">ห้องที่รายงานแล้ว</div>
+                                        <div class="sub-label" id="reportedPercent">0%</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-card">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        <div class="number" id="missingClassrooms">0</div>
+                                        <div class="label">ห้องที่ยังไม่รายงาน</div>
+                                        <div class="sub-label" id="missingPercent">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Classroom Statistics Chart -->
+                        <div class="report-section">
+                            <h5><i class="bi bi-bar-chart me-2"></i> สถิติห้องเรียนแยกตามระดับชั้น</h5>
+                            <div class="chart-container">
+                                <canvas id="classroomStatsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Classroom Performance Table -->
+                        <div class="report-section">
+                            <h5><i class="bi bi-table me-2"></i> ประสิทธิภาพห้องเรียน</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ห้องเรียน</th>
+                                            <th>ระดับชั้น</th>
+                                            <th>ครูที่ปรึกษา</th>
+                                            <th>คาบเรียนทั้งหมด</th>
+                                            <th>สอนปกติ</th>
+                                            <th>ไม่มีผู้สอน</th>
+                                            <th>อัตราการเข้าเรียน</th>
+                                            <th>รายงานล่าสุด</th>
+                                            <th>สถานะ</th>
+                                            <th>คะแนน</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="classroomPerformanceTable">
+                                        <!-- Data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Missing Reports -->
+                        <div class="report-section">
+                            <h5><i class="bi bi-exclamation-triangle me-2"></i> ห้องที่ยังไม่รายงาน</h5>
+                            <div class="alert alert-warning">
+                                <i class="bi bi-info-circle"></i> มีห้องที่ยังไม่ได้รายงานการสอน <strong id="missingCount">0</strong> ห้อง
+                            </div>
+                            <div class="row" id="missingClassroomsList">
+                                <!-- Missing classrooms will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 5: Subject Statistics -->
+                    <div class="tab-pane fade" id="subject" role="tabpanel">
+                        <div class="report-section">
+                            <h4><i class="bi bi-book me-2"></i> สถิติรายวิชา</h4>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-journal"></i>
+                                        <div class="number" id="totalSubjects">0</div>
+                                        <div class="label">จำนวนรายวิชาทั้งหมด</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-check-circle"></i>
+                                        <div class="number" id="subjectAttendanceRate">0%</div>
+                                        <div class="label">อัตราการสอนเฉลี่ย</div>
+                                        <div class="sub-label">ทุกวิชา</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                        <div class="number" id="topSubjectRate">0%</div>
+                                        <div class="label">วิชาที่สอนดีที่สุด</div>
+                                        <div class="sub-label" id="topSubjectName">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <i class="bi bi-graph-down-arrow"></i>
+                                        <div class="number" id="bottomSubjectRate">0%</div>
+                                        <div class="label">วิชาที่ต้องดูแล</div>
+                                        <div class="sub-label" id="bottomSubjectName">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subject Performance Chart -->
+                        <div class="report-section">
+                            <h5><i class="bi bi-bar-chart me-2"></i> ประสิทธิภาพรายวิชา</h5>
+                            <div class="chart-container">
+                                <canvas id="subjectPerformanceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Subject Statistics Table -->
+                        <div class="report-section">
+                            <h5><i class="bi bi-table me-2"></i> สถิติรายวิชา</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>รหัสวิชา</th>
+                                            <th>ชื่อวิชา</th>
+                                            <th>ระดับชั้น</th>
+                                            <th>จำนวนคาบ</th>
+                                            <th>สอนปกติ</th>
+                                            <th>ผู้สอนแทน</th>
+                                            <th>ไม่มีผู้สอน</th>
+                                            <th>กิจกรรม</th>
+                                            <th>อัตราการสอน</th>
+                                            <th>ครูผู้สอนหลัก</th>
+                                            <th>คะแนน</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="subjectStatisticsTable">
+                                        <!-- Data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Subject by Grade -->
+                        <div class="report-section">
+                            <h5><i class="bi bi-diagram-3 me-2"></i> สถิติรายวิชาแยกระดับชั้น</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h6>มัธยมศึกษาตอนต้น</h6>
+                                    <div class="chart-mini-container">
+                                        <canvas id="subjectJuniorChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>มัธยมศึกษาตอนปลาย</h6>
+                                    <div class="chart-mini-container">
+                                        <canvas id="subjectSeniorChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>เปรียบเทียบประเภทวิชา</h6>
+                                    <div class="chart-mini-container">
+                                        <canvas id="subjectTypeChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 6: Detailed Report -->
+                    <div class="tab-pane fade" id="detailed" role="tabpanel">
+                        <div class="report-section">
+                            <h4><i class="bi bi-table me-2"></i> รายงานละเอียด</h4>
+                            <div class="row mb-3 no-print">
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="searchDetail" placeholder="ค้นหา...">
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="filterStatusDetail">
+                                        <option value="">ทุกสถานะ</option>
+                                        <option value="ปกติ">ปกติ</option>
+                                        <option value="ผู้สอนแทน">ผู้สอนแทน</option>
+                                        <option value="ไม่มีผู้สอน">ไม่มีผู้สอน</option>
+                                        <option value="กิจกรรมอื่น">กิจกรรมอื่น</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="filterTeacherDetail">
+                                        <option value="">ครูทั้งหมด</option>
+                                        <!-- Teachers will be populated -->
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="filterSubjectDetail">
+                                        <option value="">วิชาทั้งหมด</option>
+                                        <!-- Subjects will be populated -->
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-primary me-1" onclick="filterDetailed()">
+                                        <i class="bi bi-search"></i> ค้นหา
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="clearDetailedFilter()">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>วันที่</th>
+                                            <th>ห้อง</th>
+                                            <th>คาบ</th>
+                                            <th>วิชา</th>
+                                            <th>ครูผู้สอน</th>
+                                            <th>สถานะ</th>
+                                            <th>ผู้รายงาน</th>
+                                            <th>เวลา</th>
+                                            <th>หมายเหตุ</th>
+                                            <th class="no-print">การจัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detailedReportTable">
+                                        <!-- Data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <nav aria-label="Page navigation" class="mt-3 no-print">
+                                <ul class="pagination justify-content-center" id="detailedPagination">
+                                    <!-- Pagination will be generated by JavaScript -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Report (Print Version) -->
+                <div class="card mt-4 print-only">
+                    <div class="card-header">
+                        <h5><i class="bi bi-file-text me-2"></i> สรุปรายงานสถิติ</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>สรุปสถิติภาพรวม</h6>
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>ช่วงเวลารายงาน:</td>
+                                            <td id="printPeriod"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>จำนวนคาบเรียนทั้งหมด:</td>
+                                            <td id="printTotalClasses"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>อัตราการเข้าเรียน:</td>
+                                            <td id="printAttendanceRate"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>อัตราการขาดเรียน:</td>
+                                            <td id="printAbsenceRate"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>จำนวนครูผู้สอน:</td>
+                                            <td id="printTotalTeachers"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>จำนวนห้องเรียน:</td>
+                                            <td id="printTotalClassrooms"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>สรุปตามระดับชั้น</h6>
+                                <table class="table table-sm" id="printGradeSummary">
+                                    <!-- Will be populated by JavaScript -->
+                                </table>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>ข้อสังเกตและข้อเสนอแนะ:</h6>
+                            <textarea class="form-control" rows="4" id="printNotes" placeholder="กรอกข้อสังเกตและข้อเสนอแนะ..."></textarea>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <p>ผู้จัดทำรายงาน: _________________________________</p>
+                            <p>วันที่จัดทำ: <span id="printCurrentDate"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-white border-top no-print">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <span class="text-muted">พัฒนาโดยฝ่ายบริหารงานวิชาการ โรงเรียนสกลราชวิทยานุกูล</span>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="text-muted">© 2024 ระบบบันทึกการเรียนการสอน</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    
+    <!-- Statistical Report JavaScript -->
+    <script>
+        // Global variables
+        let currentUser = null;
+        let currentRole = null;
+        let statisticsData = {};
+        let detailedReports = [];
+        let filteredDetailedReports = [];
+        let charts = {};
+        let currentDetailedPage = 1;
+        const itemsPerPage = 20;
+        
+        // Chart colors
+        const chartColors = {
+            primary: '#C00000',
+            secondary: '#E60000',
+            success: '#198754',
+            warning: '#ffc107',
+            danger: '#dc3545',
+            info: '#17a2b8',
+            grade1: '#6f42c1',
+            grade2: '#20c997',
+            grade3: '#fd7e14',
+            grade4: '#C00000',
+            grade5: '#0dcaf0',
+            grade6: '#6c757d'
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check session
+            currentUser = Auth.getCurrentUser();
+            currentRole = Auth.getCurrentRole();
+            
+            if (!currentUser || !currentRole) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Update UI based on role
+            updateUIForRole();
+            
+            // Set default dates
+            setDefaultDates();
+            
+            // Load initial data
+            loadStatisticsData();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Set print date
+            document.getElementById('printDate').textContent = new Date().toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('printCurrentDate').textContent = new Date().toLocaleDateString('th-TH');
+        });
+        
+        function updateUIForRole() {
+            // Update navbar
+            document.getElementById('navbarUser').textContent = currentUser.name;
+            
+            let roleText = '';
+            let dashboardLink = '';
+            
+            switch(currentRole) {
+                case 'admin':
+                    roleText = 'ผู้ดูแลระบบ';
+                    dashboardLink = 'dashboard_admin.html';
+                    break;
+                case 'teacher':
+                    roleText = 'ครูผู้สอน';
+                    dashboardLink = 'dashboard_teacher.html';
+                    break;
+                case 'student':
+                    roleText = 'ตัวแทนห้อง';
+                    dashboardLink = 'dashboard_student.html';
+                    break;
+            }
+            
+            document.getElementById('userRoleBadge').textContent = roleText;
+            document.getElementById('dashboardLink').href = dashboardLink;
+            document.getElementById('dashboardNavLink').href = dashboardLink;
+        }
+        
+        function setDefaultDates() {
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            // Format dates as YYYY-MM-DD
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            
+            document.getElementById('startDate').value = formatDate(firstDayOfMonth);
+            document.getElementById('endDate').value = formatDate(today);
+        }
+        
+        async function loadStatisticsData() {
+            try {
+                window.app.showLoading();
+                
+                // Get filter values
+                const filters = getFilters();
+                
+                // Load statistics data
+                await loadSummaryStatistics(filters);
+                await loadAttendanceStatistics(filters);
+                await loadTeacherStatistics(filters);
+                await loadClassroomStatistics(filters);
+                await loadSubjectStatistics(filters);
+                await loadDetailedReports(filters);
+                
+                // Update all displays
+                updateSummaryDisplay();
+                updateAttendanceDisplay();
+                updateTeacherDisplay();
+                updateClassroomDisplay();
+                updateSubjectDisplay();
+                updateDetailedDisplay();
+                
+                // Initialize charts
+                initializeCharts();
+                
+                window.app.hideLoading();
+            } catch (error) {
+                console.error('Error loading statistics data:', error);
+                window.app.hideLoading();
+                window.app.showToast('เกิดข้อผิดพลาดในการโหลดข้อมูลสถิติ', 'danger');
+            }
+        }
+        
+        function getFilters() {
+            const period = document.getElementById('reportPeriod').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const gradeLevel = document.getElementById('gradeLevel').value;
+            
+            return {
+                period: period,
+                startDate: startDate,
+                endDate: endDate,
+                gradeLevel: gradeLevel
+            };
+        }
+        
+        async function loadSummaryStatistics(filters) {
+            // In production, this would be an API call
+            // For demo, generate sample data
+            
+            const sampleData = generateSampleStatistics(filters);
+            statisticsData.summary = sampleData.summary;
+            statisticsData.gradeSummary = sampleData.gradeSummary;
+        }
+        
+        async function loadAttendanceStatistics(filters) {
+            // Generate sample attendance data
+            statisticsData.attendance = generateAttendanceData(filters);
+        }
+        
+        async function loadTeacherStatistics(filters) {
+            // Generate sample teacher data
+            statisticsData.teachers = generateTeacherData(filters);
+        }
+        
+        async function loadClassroomStatistics(filters) {
+            // Generate sample classroom data
+            statisticsData.classrooms = generateClassroomData(filters);
+        }
+        
+        async function loadSubjectStatistics(filters) {
+            // Generate sample subject data
+            statisticsData.subjects = generateSubjectData(filters);
+        }
+        
+        async function loadDetailedReports(filters) {
+            // Generate sample detailed reports
+            detailedReports = generateDetailedReports(filters);
+            filteredDetailedReports = [...detailedReports];
+        }
+        
+        function generateSampleStatistics(filters) {
+            const startDate = new Date(filters.startDate);
+            const endDate = new Date(filters.endDate);
+            const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            
+            // Sample data for summary
+            const summary = {
+                totalClasses: 1250,
+                attendanceRate: 92.5,
+                absenceRate: 5.2,
+                avgReportTime: '15 นาที',
+                reportedClassrooms: 18,
+                totalClassrooms: 24,
+                missingClassrooms: 6,
+                totalTeachers: 45,
+                teacherAttendanceRate: 94.3,
+                teacherAbsenceRate: 4.1,
+                substituteRate: 1.6,
+                totalSubjects: 35,
+                subjectAttendanceRate: 93.2,
+                topSubjectRate: 98.5,
+                topSubjectName: 'คณิตศาสตร์ 4',
+                bottomSubjectRate: 85.2,
+                bottomSubjectName: 'ภาษาอังกฤษ'
+            };
+            
+            // Sample grade summary
+            const gradeSummary = [
+                {
+                    grade: 'ม.1',
+                    classrooms: 4,
+                    totalClasses: 200,
+                    normal: 185,
+                    substitute: 10,
+                    absent: 5,
+                    activity: 0,
+                    attendanceRate: 97.5,
+                    kpi: 'ดีเยี่ยม'
+                },
+                {
+                    grade: 'ม.2',
+                    classrooms: 4,
+                    totalClasses: 210,
+                    normal: 195,
+                    substitute: 8,
+                    absent: 7,
+                    activity: 0,
+                    attendanceRate: 96.7,
+                    kpi: 'ดีเยี่ยม'
+                },
+                {
+                    grade: 'ม.3',
+                    classrooms: 4,
+                    totalClasses: 220,
+                    normal: 200,
+                    substitute: 12,
+                    absent: 8,
+                    activity: 0,
+                    attendanceRate: 96.4,
+                    kpi: 'ดีเยี่ยม'
+                },
+                {
+                    grade: 'ม.4',
+                    classrooms: 4,
+                    totalClasses: 230,
+                    normal: 205,
+                    substitute: 15,
+                    absent: 10,
+                    activity: 0,
+                    attendanceRate: 95.7,
+                    kpi: 'ดี'
+                },
+                {
+                    grade: 'ม.5',
+                    classrooms: 4,
+                    totalClasses: 240,
+                    normal: 215,
+                    substitute: 18,
+                    absent: 7,
+                    activity: 0,
+                    attendanceRate: 97.1,
+                    kpi: 'ดีเยี่ยม'
+                },
+                {
+                    grade: 'ม.6',
+                    classrooms: 4,
+                    totalClasses: 250,
+                    normal: 230,
+                    substitute: 12,
+                    absent: 8,
+                    activity: 0,
+                    attendanceRate: 96.8,
+                    kpi: 'ดีเยี่ยม'
+                }
+            ];
+            
+            return { summary, gradeSummary };
+        }
+        
+        function generateAttendanceData(filters) {
+            const days = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์'];
+            const periods = ['1', '2', '3', '4', '5', '6', '7', '8'];
+            const timesOfDay = ['เช้า (08:00-12:00)', 'บ่าย (13:00-16:00)'];
+            
+            // Weekly attendance
+            const weeklyAttendance = days.map(day => ({
+                day: day,
+                total: 250,
+                normal: 230,
+                substitute: 12,
+                absent: 8,
+                activity: 0,
+                attendanceRate: 96.8
+            }));
+            
+            // Daily attendance (last 7 days)
+            const dailyAttendance = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dayOfWeek = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'][date.getDay()];
+                
+                dailyAttendance.push({
+                    date: date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }),
+                    day: dayOfWeek,
+                    total: 250 + Math.floor(Math.random() * 50),
+                    normal: 230 + Math.floor(Math.random() * 30),
+                    substitute: 10 + Math.floor(Math.random() * 5),
+                    absent: 5 + Math.floor(Math.random() * 5),
+                    activity: Math.floor(Math.random() * 3),
+                    attendanceRate: 94 + Math.random() * 4
+                });
+            }
+            
+            // Period attendance
+            const periodAttendance = periods.map(period => ({
+                period: period,
+                attendanceRate: 90 + Math.random() * 10
+            }));
+            
+            // Time of day attendance
+            const timeOfDayAttendance = timesOfDay.map(time => ({
+                time: time,
+                attendanceRate: time.includes('เช้า') ? 95.2 : 93.8
+            }));
+            
+            // Day of week attendance
+            const dayOfWeekAttendance = days.map(day => ({
+                day: day,
+                attendanceRate: 94 + Math.random() * 4
+            }));
+            
+            return {
+                weeklyAttendance,
+                dailyAttendance,
+                periodAttendance,
+                timeOfDayAttendance,
+                dayOfWeekAttendance
+            };
+        }
+        
+        function generateTeacherData(filters) {
+            const teachers = [
+                {
+                    id: 1,
+                    name: 'ครูวีระพล สุวรรณชัยรบ',
+                    grade: 'ม.4',
+                    subject: 'คณิตศาสตร์',
+                    totalClasses: 45,
+                    normal: 42,
+                    substitute: 2,
+                    absent: 1,
+                    attendanceRate: 97.8,
+                    percentage: 97.8,
+                    kpi: 'ดีเยี่ยม'
+                },
+                {
+                    id: 2,
+                    name: 'ครูรุจิพัชญ์ อรุวีวัฒนานนท์',
+                    grade: 'ม.5-ม.6',
+                    subject: 'วิทยาศาสตร์',
+                    totalClasses: 40,
+                    normal: 38,
+                    substitute: 1,
+                    absent: 1,
+                    attendanceRate: 97.5,
+                    percentage: 97.5,
+                    kpi: 'ดีเยี่ยม'
+                },
+                {
+                    id: 3,
+                    name: 'ครูผุสดี บุญหงษ์',
+                    grade: 'ม.6',
+                    subject: 'วิทยาศาสตร์',
+                    totalClasses: 38,
+                    normal: 35,
+                    substitute: 2,
+                    absent: 1,
+                    attendanceRate: 97.4,
+                    percentage: 97.4,
+                    kpi: 'ดีเยี่ยม'
+                },
+                {
+                    id: 4,
+                    name: 'ครูสมชาย ใจดี',
+                    grade: 'ม.1',
+                    subject: 'ภาษาไทย',
+                    totalClasses: 42,
+                    normal: 39,
+                    substitute: 2,
+                    absent: 1,
+                    attendanceRate: 97.6,
+                    percentage: 97.6,
+                    kpi: 'ดีเยี่ยม'
+                },
+                {
+                    id: 5,
+                    name: 'ครูสมหมาย น่ารัก',
+                    grade: 'ม.2',
+                    subject: 'ภาษาอังกฤษ',
+                    totalClasses: 40,
+                    normal: 36,
+                    substitute: 3,
+                    absent: 1,
+                    attendanceRate: 97.5,
+                    percentage: 97.5,
+                    kpi: 'ดีเยี่ยม'
+                },
+                {
+                    id: 6,
+                    name: 'ครูใหม่ สดใส',
+                    grade: 'ม.3',
+                    subject: 'สังคมศึกษา',
+                    totalClasses: 38,
+                    normal: 34,
+                    substitute: 2,
+                    absent: 2,
+                    attendanceRate: 94.7,
+                    percentage: 94.7,
+                    kpi: 'ดี'
+                },
+                {
+                    id: 7,
+                    name: 'ครูเก่า ใจเย็น',
+                    grade: 'ม.4',
+                    subject: 'สุขศึกษา',
+                    totalClasses: 35,
+                    normal: 30,
+                    substitute: 3,
+                    absent: 2,
+                    attendanceRate: 94.3,
+                    percentage: 94.3,
+                    kpi: 'ดี'
+                },
+                {
+                    id: 8,
+                    name: 'ครูนก เสียงใส',
+                    grade: 'ม.5',
+                    subject: 'ศิลปะ',
+                    totalClasses: 32,
+                    normal: 28,
+                    substitute: 2,
+                    absent: 2,
+                    attendanceRate: 93.8,
+                    percentage: 93.8,
+                    kpi: 'ดี'
+                }
+            ];
+            
+            return teachers;
+        }
+        
+        function generateClassroomData(filters) {
+            const classrooms = [];
+            const grades = ['ม.1', 'ม.2', 'ม.3', 'ม.4', 'ม.5', 'ม.6'];
+            
+            grades.forEach(grade => {
+                for (let i = 1; i <= 4; i++) {
+                    const classroom = `${grade}/${i}`;
+                    const totalClasses = 40 + Math.floor(Math.random() * 10);
+                    const normal = 35 + Math.floor(Math.random() * 5);
+                    const absent = 1 + Math.floor(Math.random() * 3);
+                    const attendanceRate = ((normal / totalClasses) * 100).toFixed(1);
+                    
+                    classrooms.push({
+                        classroom: classroom,
+                        grade: grade,
+                        advisor: `ครูที่ปรึกษา ${grade}/${i}`,
+                        totalClasses: totalClasses,
+                        normal: normal,
+                        absent: absent,
+                        attendanceRate: parseFloat(attendanceRate),
+                        lastReport: new Date().toLocaleDateString('th-TH', { 
+                            day: 'numeric', 
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }),
+                        status: Math.random() > 0.3 ? 'ปกติ' : 'ต้องดูแล',
+                        score: 80 + Math.floor(Math.random() * 20)
+                    });
+                }
+            });
+            
+            return classrooms;
+        }
+        
+        function generateSubjectData(filters) {
+            const subjects = [
+                {
+                    code: 'ค32102',
+                    name: 'คณิตศาสตร์ 4',
+                    grade: 'ม.4',
+                    totalClasses: 45,
+                    normal: 42,
+                    substitute: 2,
+                    absent: 1,
+                    activity: 0,
+                    attendanceRate: 97.8,
+                    teacher: 'ครูวีระพล',
+                    score: 95
+                },
+                {
+                    code: 'ค32202',
+                    name: 'คณิตศาสตร์เพิ่มเติม 4',
+                    grade: 'ม.4',
+                    totalClasses: 40,
+                    normal: 38,
+                    substitute: 1,
+                    absent: 1,
+                    activity: 0,
+                    attendanceRate: 97.5,
+                    teacher: 'ครูวีระพล',
+                    score: 94
+                },
+                {
+                    code: 'ว32286',
+                    name: 'สัมมนาวิทย์พลังสิบ',
+                    grade: 'ม.5',
+                    totalClasses: 35,
+                    normal: 33,
+                    substitute: 1,
+                    absent: 1,
+                    activity: 0,
+                    attendanceRate: 97.1,
+                    teacher: 'ครูรุจิพัชญ์',
+                    score: 93
+                },
+                {
+                    code: 'ว30290',
+                    name: 'โครงงานวิทยาศาสตร์ 1',
+                    grade: 'ม.6',
+                    totalClasses: 30,
+                    normal: 28,
+                    substitute: 1,
+                    absent: 1,
+                    activity: 0,
+                    attendanceRate: 96.7,
+                    teacher: 'ครูรุจิพัชญ์',
+                    score: 92
+                },
+                {
+                    code: 'ว30284',
+                    name: 'ความถนัดทางวิทย์ 2',
+                    grade: 'ม.6',
+                    totalClasses: 32,
+                    normal: 30,
+                    substitute: 1,
+                    absent: 1,
+                    activity: 0,
+                    attendanceRate: 96.9,
+                    teacher: 'ครูผุสดี',
+                    score: 93
+                },
+                {
+                    code: 'อ32101',
+                    name: 'ภาษาอังกฤษ 1',
+                    grade: 'ม.4',
+                    totalClasses: 38,
+                    normal: 34,
+                    substitute: 2,
+                    absent: 2,
+                    activity: 0,
+                    attendanceRate: 94.7,
+                    teacher: 'ครูสมหมาย',
+                    score: 88
+                },
+                {
+                    code: 'ท32101',
+                    name: 'ภาษาไทย 1',
+                    grade: 'ม.4',
+                    totalClasses: 40,
+                    normal: 37,
+                    substitute: 2,
+                    absent: 1,
+                    activity: 0,
+                    attendanceRate: 97.5,
+                    teacher: 'ครูสมชาย',
+                    score: 92
+                },
+                {
+                    code: 'ส32101',
+                    name: 'สังคมศึกษา 1',
+                    grade: 'ม.4',
+                    totalClasses: 36,
+                    normal: 33,
+                    substitute: 2,
+                    absent: 1,
+                    activity: 0,
+                    attendanceRate: 97.2,
+                    teacher: 'ครูใหม่',
+                    score: 90
+                }
+            ];
+            
+            return subjects;
+        }
+        
+        function generateDetailedReports(filters) {
+            const reports = [];
+            const classrooms = ['ม.4/1', 'ม.4/2', 'ม.5/1', 'ม.5/2', 'ม.6/1', 'ม.6/2'];
+            const teachers = [
+                'ครูวีระพล สุวรรณชัยรบ',
+                'ครูรุจิพัชญ์ อรุวีวัฒนานนท์',
+                'ครูผุสดี บุญหงษ์',
+                'ครูสมชาย ใจดี',
+                'ครูสมหมาย น่ารัก'
+            ];
+            const subjects = [
+                'คณิตศาสตร์ 4',
+                'วิทยาศาสตร์',
+                'ภาษาอังกฤษ',
+                'ภาษาไทย',
+                'สังคมศึกษา'
+            ];
+            const statuses = ['ปกติ', 'ปกติ', 'ปกติ', 'ผู้สอนแทน', 'ไม่มีผู้สอน', 'กิจกรรมอื่น'];
+            
+            const startDate = new Date(filters.startDate);
+            const endDate = new Date(filters.endDate);
+            const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            
+            for (let i = 0; i <= daysDiff; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                const dateStr = currentDate.toISOString().split('T')[0];
+                
+                // Generate 10-20 reports per day
+                const reportsPerDay = 10 + Math.floor(Math.random() * 11);
+                
+                for (let j = 0; j < reportsPerDay; j++) {
+                    const classroom = classrooms[Math.floor(Math.random() * classrooms.length)];
+                    const teacher = teachers[Math.floor(Math.random() * teachers.length)];
+                    const subject = subjects[Math.floor(Math.random() * subjects.length)];
+                    const status = statuses[Math.floor(Math.random() * statuses.length)];
+                    
+                    // Random time between 8:00 and 16:00
+                    const hour = 8 + Math.floor(Math.random() * 8);
+                    const minute = Math.floor(Math.random() * 60);
+                    const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    
+                    // Random period 1-8
+                    const period = Math.floor(Math.random() * 8) + 1;
+                    
+                    reports.push({
+                        id: `report_${dateStr}_${j}`,
+                        date: dateStr,
+                        formattedDate: formatDateThai(dateStr),
+                        classroom: classroom,
+                        period: period,
+                        subject: subject,
+                        teacher: teacher,
+                        status: status,
+                        reporter: 'นักเรียนตัวแทน',
+                        time: time,
+                        notes: status === 'กิจกรรมอื่น' ? 'กิจกรรมโรงเรียน' : ''
+                    });
+                }
+            }
+            
+            return reports;
+        }
+        
+        function formatDateThai(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('th-TH', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+        
+        function updateSummaryDisplay() {
+            const summary = statisticsData.summary;
+            const gradeSummary = statisticsData.gradeSummary;
+            
+            // Update summary cards
+            document.getElementById('totalClasses').textContent = summary.totalClasses.toLocaleString();
+            document.getElementById('attendanceRate').textContent = `${summary.attendanceRate}%`;
+            document.getElementById('absenceRate').textContent = `${summary.absenceRate}%`;
+            document.getElementById('avgReportTime').textContent = summary.avgReportTime;
+            
+            // Set period text
+            const period = document.getElementById('reportPeriod').value;
+            let periodText = '';
+            switch(period) {
+                case 'today': periodText = 'วันนี้'; break;
+                case 'yesterday': periodText = 'เมื่อวาน'; break;
+                case 'week': periodText = 'สัปดาห์นี้'; break;
+                case 'lastweek': periodText = 'สัปดาห์ที่แล้ว'; break;
+                case 'month': periodText = 'เดือนนี้'; break;
+                case 'lastmonth': periodText = 'เดือนที่แล้ว'; break;
+                case 'term': periodText = 'ภาคเรียนนี้'; break;
+                case 'lastterm': periodText = 'ภาคเรียนที่แล้ว'; break;
+                case 'year': periodText = 'ปีการศึกษานี้'; break;
+                case 'custom': periodText = 'ช่วงกำหนดเอง'; break;
+            }
+            document.getElementById('totalClassesPeriod').textContent = periodText;
+            
+            // Update grade summary table
+            const gradeTable = document.getElementById('gradeSummaryTable');
+            gradeTable.innerHTML = gradeSummary.map(grade => `
+                <tr>
+                    <td><span class="grade-badge badge-${grade.grade.replace('.', '')}">${grade.grade}</span></td>
+                    <td>${grade.classrooms}</td>
+                    <td>${grade.totalClasses}</td>
+                    <td>${grade.normal}</td>
+                    <td>${grade.substitute}</td>
+                    <td>${grade.absent}</td>
+                    <td>${grade.activity}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">${grade.attendanceRate}%</div>
+                            <div class="progress progress-thin flex-grow-1">
+                                <div class="progress-bar bg-success" style="width: ${grade.attendanceRate}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="kpi-indicator ${getKPIClass(grade.attendanceRate)}"></span>
+                        ${grade.kpi}
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Update print version
+            document.getElementById('printPeriod').textContent = periodText;
+            document.getElementById('printTotalClasses').textContent = summary.totalClasses.toLocaleString();
+            document.getElementById('printAttendanceRate').textContent = `${summary.attendanceRate}%`;
+            document.getElementById('printAbsenceRate').textContent = `${summary.absenceRate}%`;
+            document.getElementById('printTotalTeachers').textContent = summary.totalTeachers;
+            document.getElementById('printTotalClassrooms').textContent = summary.totalClassrooms;
+            
+            const printGradeTable = document.getElementById('printGradeSummary');
+            printGradeTable.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>ระดับชั้น</th>
+                        <th>อัตราการเข้าเรียน</th>
+                        <th>สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${gradeSummary.map(grade => `
+                        <tr>
+                            <td>${grade.grade}</td>
+                            <td>${grade.attendanceRate}%</td>
+                            <td>${grade.kpi}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+        }
+        
+        function updateAttendanceDisplay() {
+            const attendance = statisticsData.attendance;
+            
+            // Update daily attendance table
+            const dailyTable = document.getElementById('dailyAttendanceTable');
+            dailyTable.innerHTML = attendance.dailyAttendance.map(day => `
+                <tr>
+                    <td>${day.date}</td>
+                    <td>${day.day}</td>
+                    <td>${day.total}</td>
+                    <td>${day.normal}</td>
+                    <td>${day.substitute}</td>
+                    <td>${day.absent}</td>
+                    <td>${day.activity}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">${day.attendanceRate.toFixed(1)}%</div>
+                            <div class="progress progress-thin flex-grow-1">
+                                <div class="progress-bar ${getProgressBarClass(day.attendanceRate)}" 
+                                     style="width: ${day.attendanceRate}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        ${getTrendIcon(day.attendanceRate)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function updateTeacherDisplay() {
+            const teachers = statisticsData.teachers;
+            const summary = statisticsData.summary;
+            
+            // Update teacher summary cards
+            document.getElementById('totalTeachers').textContent = summary.totalTeachers;
+            document.getElementById('teacherAttendanceRate').textContent = `${summary.teacherAttendanceRate}%`;
+            document.getElementById('teacherAbsenceRate').textContent = `${summary.teacherAbsenceRate}%`;
+            document.getElementById('substituteRate').textContent = `${summary.substituteRate}%`;
+            
+            // Update teacher performance table
+            const teacherTable = document.getElementById('teacherPerformanceTable');
+            teacherTable.innerHTML = teachers.map(teacher => `
+                <tr>
+                    <td>${teacher.name}</td>
+                    <td>${teacher.grade}</td>
+                    <td>${teacher.subject}</td>
+                    <td>${teacher.totalClasses}</td>
+                    <td>${teacher.normal}</td>
+                    <td>${teacher.substitute}</td>
+                    <td>${teacher.absent}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">${teacher.attendanceRate.toFixed(1)}%</div>
+                            <div class="progress progress-thin flex-grow-1">
+                                <div class="progress-bar ${getProgressBarClass(teacher.attendanceRate)}" 
+                                     style="width: ${teacher.attendanceRate}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${teacher.percentage.toFixed(1)}%</td>
+                    <td>
+                        <span class="kpi-indicator ${getKPIClass(teacher.attendanceRate)}"></span>
+                        ${teacher.kpi}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewTeacherDetail(${teacher.id})">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Update top teachers
+            const topTeachers = [...teachers].sort((a, b) => b.attendanceRate - a.attendanceRate).slice(0, 5);
+            const topTeachersList = document.getElementById('topTeachersList');
+            topTeachersList.innerHTML = topTeachers.map(teacher => `
+                <div class="teacher-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${teacher.name}</h6>
+                            <small class="text-muted">${teacher.subject} - ${teacher.grade}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="number">${teacher.attendanceRate.toFixed(1)}%</div>
+                            <small>อัตราการสอน</small>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Update bottom teachers
+            const bottomTeachers = [...teachers].sort((a, b) => a.attendanceRate - b.attendanceRate).slice(0, 3);
+            const bottomTeachersList = document.getElementById('bottomTeachersList');
+            bottomTeachersList.innerHTML = bottomTeachers.map(teacher => `
+                <div class="teacher-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${teacher.name}</h6>
+                            <small class="text-muted">${teacher.subject} - ${teacher.grade}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="number text-danger">${teacher.attendanceRate.toFixed(1)}%</div>
+                            <small>อัตราการสอน</small>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Populate teacher filter for detailed tab
+            const teacherFilter = document.getElementById('filterTeacherDetail');
+            teacherFilter.innerHTML = '<option value="">ครูทั้งหมด</option>' +
+                teachers.map(teacher => 
+                    `<option value="${teacher.name}">${teacher.name}</option>`
+                ).join('');
+        }
+        
+        function updateClassroomDisplay() {
+            const classrooms = statisticsData.classrooms;
+            const summary = statisticsData.summary;
+            
+            // Update classroom summary cards
+            document.getElementById('totalClassrooms').textContent = summary.totalClassrooms;
+            document.getElementById('reportedClassrooms').textContent = summary.reportedClassrooms;
+            document.getElementById('missingClassrooms').textContent = summary.missingClassrooms;
+            document.getElementById('reportedPercent').textContent = 
+                `${((summary.reportedClassrooms / summary.totalClassrooms) * 100).toFixed(1)}%`;
+            document.getElementById('missingPercent').textContent = 
+                `${((summary.missingClassrooms / summary.totalClassrooms) * 100).toFixed(1)}%`;
+            
+            // Update missing count
+            document.getElementById('missingCount').textContent = summary.missingClassrooms;
+            
+            // Update classroom performance table
+            const classroomTable = document.getElementById('classroomPerformanceTable');
+            classroomTable.innerHTML = classrooms.map(classroom => `
+                <tr>
+                    <td>${classroom.classroom}</td>
+                    <td><span class="grade-badge badge-${classroom.grade.replace('.', '')}">${classroom.grade}</span></td>
+                    <td>${classroom.advisor}</td>
+                    <td>${classroom.totalClasses}</td>
+                    <td>${classroom.normal}</td>
+                    <td>${classroom.absent}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">${classroom.attendanceRate.toFixed(1)}%</div>
+                            <div class="progress progress-thin flex-grow-1">
+                                <div class="progress-bar ${getProgressBarClass(classroom.attendanceRate)}" 
+                                     style="width: ${classroom.attendanceRate}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${classroom.lastReport}</td>
+                    <td>
+                        <span class="status-badge ${classroom.status === 'ปกติ' ? 'status-normal' : 'status-absent'}">
+                            ${classroom.status}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${getScoreBadgeClass(classroom.score)}">
+                            ${classroom.score}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Update missing classrooms list
+            const missingList = document.getElementById('missingClassroomsList');
+            // For demo, show first 6 classrooms as missing
+            const missingClassrooms = classrooms.slice(0, 6);
+            missingList.innerHTML = missingClassrooms.map(classroom => `
+                <div class="col-md-4 mb-3">
+                    <div class="alert alert-warning">
+                        <h6>${classroom.classroom}</h6>
+                        <p class="mb-1"><small>ครูที่ปรึกษา: ${classroom.advisor}</small></p>
+                        <p class="mb-0"><small>ไม่ได้รับรายงานตั้งแต่: ${classroom.lastReport}</small></p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateSubjectDisplay() {
+            const subjects = statisticsData.subjects;
+            const summary = statisticsData.summary;
+            
+            // Update subject summary cards
+            document.getElementById('totalSubjects').textContent = summary.totalSubjects;
+            document.getElementById('subjectAttendanceRate').textContent = `${summary.subjectAttendanceRate}%`;
+            document.getElementById('topSubjectRate').textContent = `${summary.topSubjectRate}%`;
+            document.getElementById('topSubjectName').textContent = summary.topSubjectName;
+            document.getElementById('bottomSubjectRate').textContent = `${summary.bottomSubjectRate}%`;
+            document.getElementById('bottomSubjectName').textContent = summary.bottomSubjectName;
+            
+            // Update subject statistics table
+            const subjectTable = document.getElementById('subjectStatisticsTable');
+            subjectTable.innerHTML = subjects.map(subject => `
+                <tr>
+                    <td>${subject.code}</td>
+                    <td>${subject.name}</td>
+                    <td><span class="grade-badge badge-${subject.grade.replace('.', '')}">${subject.grade}</span></td>
+                    <td>${subject.totalClasses}</td>
+                    <td>${subject.normal}</td>
+                    <td>${subject.substitute}</td>
+                    <td>${subject.absent}</td>
+                    <td>${subject.activity}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">${subject.attendanceRate.toFixed(1)}%</div>
+                            <div class="progress progress-thin flex-grow-1">
+                                <div class="progress-bar ${getProgressBarClass(subject.attendanceRate)}" 
+                                     style="width: ${subject.attendanceRate}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${subject.teacher}</td>
+                    <td>
+                        <span class="badge ${getScoreBadgeClass(subject.score)}">
+                            ${subject.score}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Populate subject filter for detailed tab
+            const subjectFilter = document.getElementById('filterSubjectDetail');
+            subjectFilter.innerHTML = '<option value="">วิชาทั้งหมด</option>' +
+                subjects.map(subject => 
+                    `<option value="${subject.name}">${subject.code} ${subject.name}</option>`
+                ).join('');
+        }
+        
+        function updateDetailedDisplay() {
+            renderDetailedTable();
+            renderDetailedPagination();
+        }
+        
+        function renderDetailedTable() {
+            const startIndex = (currentDetailedPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageReports = filteredDetailedReports.slice(startIndex, endIndex);
+            
+            const table = document.getElementById('detailedReportTable');
+            table.innerHTML = pageReports.map(report => `
+                <tr>
+                    <td>${report.formattedDate}</td>
+                    <td>${report.classroom}</td>
+                    <td>${report.period}</td>
+                    <td>${report.subject}</td>
+                    <td>${report.teacher}</td>
+                    <td>
+                        <span class="status-badge ${getStatusBadgeClass(report.status)}">
+                            ${report.status}
+                        </span>
+                    </td>
+                    <td>${report.reporter}</td>
+                    <td>${report.time}</td>
+                    <td>${report.notes || '-'}</td>
+                    <td class="no-print">
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewReportDetail('${report.id}')">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Update report count
+            const countElement = document.querySelector('#detailed-tab .badge');
+            if (countElement) {
+                countElement.textContent = filteredDetailedReports.length;
+            } else {
+                // Add badge if not exists
+                const tab = document.querySelector('#detailed-tab');
+                tab.innerHTML += ` <span class="badge bg-primary">${filteredDetailedReports.length}</span>`;
+            }
+        }
+        
+        function renderDetailedPagination() {
+            const totalPages = Math.ceil(filteredDetailedReports.length / itemsPerPage);
+            const pagination = document.getElementById('detailedPagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            // Previous button
+            html += `
+                <li class="page-item ${currentDetailedPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changeDetailedPage(${currentDetailedPage - 1})" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            `;
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentDetailedPage - 2 && i <= currentDetailedPage + 2)) {
+                    html += `
+                        <li class="page-item ${i === currentDetailedPage ? 'active' : ''}">
+                            <a class="page-link" href="#" onclick="changeDetailedPage(${i})">${i}</a>
+                        </li>
+                    `;
+                } else if (i === currentDetailedPage - 3 || i === currentDetailedPage + 3) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+            
+            // Next button
+            html += `
+                <li class="page-item ${currentDetailedPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changeDetailedPage(${currentDetailedPage + 1})" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+        
+        function changeDetailedPage(page) {
+            currentDetailedPage = page;
+            renderDetailedTable();
+            renderDetailedPagination();
+        }
+        
+        function filterDetailed() {
+            const searchTerm = document.getElementById('searchDetail').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatusDetail').value;
+            const teacherFilter = document.getElementById('filterTeacherDetail').value;
+            const subjectFilter = document.getElementById('filterSubjectDetail').value;
+            
+            filteredDetailedReports = detailedReports.filter(report => {
+                const matchesSearch = searchTerm === '' || 
+                    report.classroom.toLowerCase().includes(searchTerm) ||
+                    report.subject.toLowerCase().includes(searchTerm) ||
+                    report.teacher.toLowerCase().includes(searchTerm) ||
+                    report.reporter.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = statusFilter === '' || report.status === statusFilter;
+                const matchesTeacher = teacherFilter === '' || report.teacher === teacherFilter;
+                const matchesSubject = subjectFilter === '' || report.subject === subjectFilter;
+                
+                return matchesSearch && matchesStatus && matchesTeacher && matchesSubject;
+            });
+            
+            currentDetailedPage = 1;
+            updateDetailedDisplay();
+        }
+        
+        function clearDetailedFilter() {
+            document.getElementById('searchDetail').value = '';
+            document.getElementById('filterStatusDetail').value = '';
+            document.getElementById('filterTeacherDetail').value = '';
+            document.getElementById('filterSubjectDetail').value = '';
+            
+            filteredDetailedReports = [...detailedReports];
+            currentDetailedPage = 1;
+            updateDetailedDisplay();
+        }
+        
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'ปกติ': return 'status-normal';
+                case 'ผู้สอนแทน': return 'status-substitute';
+                case 'ไม่มีผู้สอน': return 'status-absent';
+                case 'กิจกรรมอื่น': return 'status-activity';
+                default: return 'status-normal';
+            }
+        }
+        
+        function getKPIClass(rate) {
+            if (rate >= 95) return 'kpi-excellent';
+            if (rate >= 90) return 'kpi-good';
+            if (rate >= 85) return 'kpi-fair';
+            return 'kpi-poor';
+        }
+        
+        function getProgressBarClass(rate) {
+            if (rate >= 95) return 'bg-success';
+            if (rate >= 90) return 'bg-info';
+            if (rate >= 85) return 'bg-warning';
+            return 'bg-danger';
+        }
+        
+        function getScoreBadgeClass(score) {
+            if (score >= 90) return 'bg-success';
+            if (score >= 80) return 'bg-info';
+            if (score >= 70) return 'bg-warning';
+            return 'bg-danger';
+        }
+        
+        function getTrendIcon(rate) {
+            if (rate >= 95) return '<i class="bi bi-arrow-up-circle text-success"></i>';
+            if (rate >= 90) return '<i class="bi bi-dash-circle text-warning"></i>';
+            return '<i class="bi bi-arrow-down-circle text-danger"></i>';
+        }
+        
+        function initializeCharts() {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            
+            // Weekly Attendance Chart
+            const weeklyCtx = document.getElementById('weeklyAttendanceChart').getContext('2d');
+            const weeklyData = statisticsData.attendance.weeklyAttendance;
+            
+            charts.weeklyAttendance = new Chart(weeklyCtx, {
+                type: 'line',
+                data: {
+                    labels: weeklyData.map(d => d.day),
+                    datasets: [
+                        {
+                            label: 'อัตราการเข้าเรียน (%)',
+                            data: weeklyData.map(d => d.attendanceRate),
+                            borderColor: chartColors.primary,
+                            backgroundColor: 'rgba(192, 0, 0, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'จำนวนคาบทั้งหมด',
+                            data: weeklyData.map(d => d.total),
+                            borderColor: chartColors.info,
+                            backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'อัตราการเข้าเรียน (%)'
+                            },
+                            min: 80,
+                            max: 100
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'จำนวนคาบ'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    }
+                }
+            });
+            
+            // Teaching Status Chart
+            const statusCtx = document.getElementById('teachingStatusChart').getContext('2d');
+            const gradeSummary = statisticsData.gradeSummary;
+            
+            const totalNormal = gradeSummary.reduce((sum, grade) => sum + grade.normal, 0);
+            const totalSubstitute = gradeSummary.reduce((sum, grade) => sum + grade.substitute, 0);
+            const totalAbsent = gradeSummary.reduce((sum, grade) => sum + grade.absent, 0);
+            const totalActivity = gradeSummary.reduce((sum, grade) => sum + grade.activity, 0);
+            
+            charts.teachingStatus = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['สอนปกติ', 'ผู้สอนแทน', 'ไม่มีผู้สอน', 'กิจกรรม'],
+                    datasets: [{
+                        data: [totalNormal, totalSubstitute, totalAbsent, totalActivity],
+                        backgroundColor: [
+                            chartColors.success,
+                            chartColors.warning,
+                            chartColors.danger,
+                            chartColors.info
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${percentage}%`;
+                            },
+                            color: '#fff',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+            
+            // Grade Report Chart
+            const gradeCtx = document.getElementById('gradeReportChart').getContext('2d');
+            
+            charts.gradeReport = new Chart(gradeCtx, {
+                type: 'bar',
+                data: {
+                    labels: gradeSummary.map(g => g.grade),
+                    datasets: [
+                        {
+                            label: 'อัตราการเข้าเรียน (%)',
+                            data: gradeSummary.map(g => g.attendanceRate),
+                            backgroundColor: [
+                                chartColors.grade1,
+                                chartColors.grade2,
+                                chartColors.grade3,
+                                chartColors.grade4,
+                                chartColors.grade5,
+                                chartColors.grade6
+                            ],
+                            borderColor: [
+                                chartColors.grade1,
+                                chartColors.grade2,
+                                chartColors.grade3,
+                                chartColors.grade4,
+                                chartColors.grade5,
+                                chartColors.grade6
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'อัตราการเข้าเรียน (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Report Time Chart
+            const timeCtx = document.getElementById('reportTimeChart').getContext('2d');
+            const periods = ['คาบ 1', 'คาบ 2', 'คาบ 3', 'คาบ 4', 'คาบ 5', 'คาบ 6', 'คาบ 7', 'คาบ 8'];
+            
+            charts.reportTime = new Chart(timeCtx, {
+                type: 'bar',
+                data: {
+                    labels: periods,
+                    datasets: [
+                        {
+                            label: 'เวลารายงานเฉลี่ย (นาที)',
+                            data: [5, 8, 12, 15, 10, 8, 6, 4],
+                            backgroundColor: chartColors.primary,
+                            borderColor: chartColors.secondary,
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'เวลารายงานเฉลี่ย (นาที)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Attendance Trend Chart
+            const trendCtx = document.getElementById('attendanceTrendChart').getContext('2d');
+            const dailyAttendance = statisticsData.attendance.dailyAttendance;
+            
+            charts.attendanceTrend = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: dailyAttendance.map(d => d.date),
+                    datasets: [
+                        {
+                            label: 'อัตราการเข้าเรียน (%)',
+                            data: dailyAttendance.map(d => d.attendanceRate),
+                            borderColor: chartColors.primary,
+                            backgroundColor: 'rgba(192, 0, 0, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 90,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'อัตราการเข้าเรียน (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Teacher Performance Chart
+            const teacherCtx = document.getElementById('teacherPerformanceChart').getContext('2d');
+            const teachers = statisticsData.teachers.slice(0, 8); // Show first 8 teachers
+            
+            charts.teacherPerformance = new Chart(teacherCtx, {
+                type: 'bar',
+                data: {
+                    labels: teachers.map(t => t.name.split(' ')[1]), // Show only last name
+                    datasets: [
+                        {
+                            label: 'อัตราการสอน (%)',
+                            data: teachers.map(t => t.attendanceRate),
+                            backgroundColor: teachers.map(t => 
+                                t.attendanceRate >= 95 ? chartColors.success :
+                                t.attendanceRate >= 90 ? chartColors.info :
+                                t.attendanceRate >= 85 ? chartColors.warning : chartColors.danger
+                            ),
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'อัตราการสอน (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Classroom Stats Chart
+            const classroomCtx = document.getElementById('classroomStatsChart').getContext('2d');
+            const classrooms = statisticsData.classrooms;
+            
+            // Group by grade
+            const gradeGroups = {};
+            classrooms.forEach(classroom => {
+                if (!gradeGroups[classroom.grade]) {
+                    gradeGroups[classroom.grade] = [];
+                }
+                gradeGroups[classroom.grade].push(classroom);
+            });
+            
+            const grades = Object.keys(gradeGroups);
+            const avgAttendance = grades.map(grade => {
+                const gradeClassrooms = gradeGroups[grade];
+                const avg = gradeClassrooms.reduce((sum, c) => sum + c.attendanceRate, 0) / gradeClassrooms.length;
+                return avg.toFixed(1);
+            });
+            
+            charts.classroomStats = new Chart(classroomCtx, {
+                type: 'bar',
+                data: {
+                    labels: grades,
+                    datasets: [
+                        {
+                            label: 'อัตราการเข้าเรียนเฉลี่ย (%)',
+                            data: avgAttendance,
+                            backgroundColor: [
+                                chartColors.grade1,
+                                chartColors.grade2,
+                                chartColors.grade3,
+                                chartColors.grade4,
+                                chartColors.grade5,
+                                chartColors.grade6
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'อัตราการเข้าเรียน (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Subject Performance Chart
+            const subjectCtx = document.getElementById('subjectPerformanceChart').getContext('2d');
+            const subjects = statisticsData.subjects;
+            
+            charts.subjectPerformance = new Chart(subjectCtx, {
+                type: 'bar',
+                data: {
+                    labels: subjects.map(s => s.name),
+                    datasets: [
+                        {
+                            label: 'อัตราการสอน (%)',
+                            data: subjects.map(s => s.attendanceRate),
+                            backgroundColor: subjects.map(s => 
+                                s.attendanceRate >= 95 ? chartColors.success :
+                                s.attendanceRate >= 90 ? chartColors.info :
+                                s.attendanceRate >= 85 ? chartColors.warning : chartColors.danger
+                            ),
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y', // Horizontal bar chart
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'อัตราการสอน (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Period Attendance Chart
+            const periodCtx = document.getElementById('periodAttendanceChart').getContext('2d');
+            const periodAttendance = statisticsData.attendance.periodAttendance;
+            
+            charts.periodAttendance = new Chart(periodCtx, {
+                type: 'line',
+                data: {
+                    labels: periodAttendance.map(p => `คาบ ${p.period}`),
+                    datasets: [
+                        {
+                            label: 'อัตราการเข้าเรียน (%)',
+                            data: periodAttendance.map(p => p.attendanceRate),
+                            borderColor: chartColors.primary,
+                            backgroundColor: 'rgba(192, 0, 0, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 85,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Day of Week Chart
+            const dayCtx = document.getElementById('dayOfWeekChart').getContext('2d');
+            const dayOfWeekAttendance = statisticsData.attendance.dayOfWeekAttendance;
+            
+            charts.dayOfWeek = new Chart(dayCtx, {
+                type: 'bar',
+                data: {
+                    labels: dayOfWeekAttendance.map(d => d.day),
+                    datasets: [
+                        {
+                            label: 'อัตราการเข้าเรียน (%)',
+                            data: dayOfWeekAttendance.map(d => d.attendanceRate),
+                            backgroundColor: chartColors.info,
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 90,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        function setupEventListeners() {
+            // Filter form submission
+            document.getElementById('filterForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                loadStatisticsData();
+                window.app.showToast('กรองข้อมูลสำเร็จ');
+            });
+            
+            // Report period change
+            document.getElementById('reportPeriod').addEventListener('change', function() {
+                updateDateRangeByPeriod(this.value);
+            });
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.app.showLogoutConfirm();
+            });
+        }
+        
+        function updateDateRangeByPeriod(period) {
+            const today = new Date();
+            let startDate, endDate = today;
+            
+            switch(period) {
+                case 'today':
+                    startDate = today;
+                    break;
+                case 'yesterday':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 1);
+                    endDate = startDate;
+                    break;
+                case 'week':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 7);
+                    break;
+                case 'lastweek':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 14);
+                    endDate = new Date(today);
+                    endDate.setDate(today.getDate() - 8);
+                    break;
+                case 'month':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+                case 'lastmonth':
+                    startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+                    break;
+                case 'term':
+                    const currentTerm = getCurrentSemester();
+                    if (currentTerm === 1) {
+                        startDate = new Date(today.getFullYear(), 4, 1); // May 1st
+                        endDate = new Date(today.getFullYear(), 9, 30); // October 31st
+                    } else {
+                        startDate = new Date(today.getFullYear(), 10, 1); // November 1st
+                        endDate = new Date(today.getFullYear() + 1, 3, 30); // April 30th
+                    }
+                    break;
+                case 'lastterm':
+                    const lastTerm = getCurrentSemester() === 1 ? 2 : 1;
+                    if (lastTerm === 1) {
+                        startDate = new Date(today.getFullYear() - 1, 4, 1);
+                        endDate = new Date(today.getFullYear() - 1, 9, 30);
+                    } else {
+                        startDate = new Date(today.getFullYear() - 1, 10, 1);
+                        endDate = new Date(today.getFullYear(), 3, 30);
+                    }
+                    break;
+                case 'year':
+                    const currentMonth = today.getMonth();
+                    if (currentMonth >= 5) { // After May
+                        startDate = new Date(today.getFullYear(), 4, 1); // May 1st
+                        endDate = new Date(today.getFullYear() + 1, 3, 30); // April 30th next year
+                    } else {
+                        startDate = new Date(today.getFullYear() - 1, 4, 1);
+                        endDate = new Date(today.getFullYear(), 3, 30);
+                    }
+                    break;
+                case 'custom':
+                    // Don't auto-fill for custom
+                    return;
+            }
+            
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            
+            document.getElementById('startDate').value = formatDate(startDate);
+            document.getElementById('endDate').value = formatDate(endDate);
+        }
+        
+        function getCurrentSemester() {
+            const month = new Date().getMonth() + 1;
+            return month >= 5 && month <= 10 ? 1 : 2;
+        }
+        
+        function resetFilters() {
+            document.getElementById('reportPeriod').value = 'month';
+            document.getElementById('gradeLevel').value = '';
+            setDefaultDates();
+            loadStatisticsData();
+            window.app.showToast('รีเซ็ตตัวกรองสำเร็จ');
+        }
+        
+        function refreshData() {
+            loadStatisticsData();
+            window.app.showToast('รีเฟรชข้อมูลสำเร็จ');
+        }
+        
+        function viewTeacherDetail(teacherId) {
+            // In production, this would navigate to teacher detail page
+            const teacher = statisticsData.teachers.find(t => t.id === teacherId);
+            if (teacher) {
+                alert(`ดูรายละเอียดครู: ${teacher.name}\nอัตราการสอน: ${teacher.attendanceRate}%\nคะแนน KPI: ${teacher.kpi}`);
+            }
+        }
+        
+        function viewReportDetail(reportId) {
+            // In production, this would show report details
+            const report = detailedReports.find(r => r.id === reportId);
+            if (report) {
+                alert(`รายงานการสอน\nวันที่: ${report.formattedDate}\nห้อง: ${report.classroom}\nวิชา: ${report.subject}\nครูผู้สอน: ${report.teacher}\nสถานะ: ${report.status}`);
+            }
+        }
+        
+        function generatePDF() {
+            window.app.showToast('กำลังสร้างไฟล์ PDF...');
+            // In production, implement PDF generation
+            // You can use libraries like jsPDF or make API call to generate PDF
+        }
+        
+        function exportExcel() {
+            window.app.showToast('กำลังสร้างไฟล์ Excel...');
+            // In production, implement Excel export
+            // You can use libraries like SheetJS or make API call
+        }
+    </script>
+</body>
+</html>

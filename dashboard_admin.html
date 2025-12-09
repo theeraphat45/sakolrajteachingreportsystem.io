@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แดชบอร์ดผู้ดูแลระบบ - โรงเรียนสกลราชวิทยานุกูล</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-red: #C00000;
+            --light-bg: #F8F9FA;
+            --white: #FFFFFF;
+        }
+        body {
+            font-family: 'Sarabun', 'Prompt', sans-serif;
+            background-color: var(--light-bg);
+        }
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .sidebar {
+            background-color: var(--white);
+            min-height: calc(100vh - 56px);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .sidebar .nav-link {
+            color: #333;
+            padding: 12px 20px;
+            border-left: 4px solid transparent;
+        }
+        .sidebar .nav-link.active {
+            background-color: var(--light-bg);
+            border-left-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+        .sidebar .nav-link:hover {
+            background-color: var(--light-bg);
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: var(--primary-red);
+            color: white;
+            font-weight: 500;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-card i {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: var(--primary-red);
+        }
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-red);
+        }
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .badge-report {
+            background-color: #28a745;
+            color: white;
+        }
+        .badge-missing {
+            background-color: #dc3545;
+            color: white;
+        }
+        .progress {
+            height: 10px;
+            margin-top: 10px;
+        }
+        .progress-bar {
+            background-color: var(--primary-red);
+        }
+        .role-badge {
+            background-color: var(--primary-red);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="assets/logo.png" alt="โรงเรียนสกลราชวิทยานุกูล">
+                <span class="fw-bold" style="color: var(--primary-red);">ระบบบันทึกการเรียนการสอน<br><small>โรงเรียนสกลราชวิทยานุกูล</small></span>
+            </a>
+            <div class="navbar-nav ms-auto align-items-center">
+                <span class="nav-item me-3">
+                    <span id="navbarUser"></span>
+                    <span class="role-badge">ผู้ดูแลระบบ</span>
+                </span>
+                <a href="profile.html" class="nav-link me-3">
+                    <i class="bi bi-person-circle"></i> โปรไฟล์
+                </a>
+                <a href="#" id="logoutBtn" class="nav-link btn btn-outline-danger">
+                    <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
+                </a>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 col-lg-2 d-md-block sidebar collapse p-0">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="dashboard_admin.html">
+                                <i class="bi bi-speedometer2 me-2"></i> แดชบอร์ด
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="users.html">
+                                <i class="bi bi-people me-2"></i> จัดการผู้ใช้
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="subjects.html">
+                                <i class="bi bi-book me-2"></i> จัดการรายวิชา
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="report.html">
+                                <i class="bi bi-clipboard-check me-2"></i> รายงานการสอน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="history.html">
+                                <i class="bi bi-clock-history me-2"></i> ประวัติรายงาน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="statistical_report.html">
+                                <i class="bi bi-graph-up me-2"></i> สถิติและรายงาน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="retrospective.html">
+                                <i class="bi bi-calendar-month me-2"></i> รายงานย้อนหลัง
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="reset-password.html">
+                                <i class="bi bi-key me-2"></i> รีเซ็ตรหัสผ่าน
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Main Content -->
+            <div class="col-md-10 col-lg-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">แดชบอร์ดผู้ดูแลระบบ</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshDashboard()">
+                                <i class="bi bi-arrow-clockwise"></i> รีเฟรช
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="exportData('csv')">
+                                <i class="bi bi-download"></i> ดาวน์โหลดข้อมูล
+                            </button>
+                        </div>
+                        <select class="form-select form-select-sm w-auto" id="gradeFilter">
+                            <option value="">ทั้งหมด</option>
+                            <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
+                            <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
+                            <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
+                            <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
+                            <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
+                            <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <i class="bi bi-building"></i>
+                            <div class="number" id="totalClassrooms">0</div>
+                            <div class="label">ห้องเรียนทั้งหมด</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <i class="bi bi-check-circle"></i>
+                            <div class="number" id="reportedToday">0</div>
+                            <div class="label">รายงานแล้ววันนี้</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <i class="bi bi-x-circle"></i>
+                            <div class="number" id="notReported">0</div>
+                            <div class="label">ยังไม่ได้รายงาน</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <i class="bi bi-percent"></i>
+                            <div class="number" id="reportPercentage">0%</div>
+                            <div class="label">อัตราการรายงาน</div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-graph-up me-2"></i> อัตราการเข้าเรียนรายเดือน
+                            </div>
+                            <div class="card-body">
+                                <canvas id="attendanceChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-pie-chart me-2"></i> สถานะรายงานวันนี้
+                            </div>
+                            <div class="card-body">
+                                <canvas id="reportStatusChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Reports -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-clock-history me-2"></i> รายงานล่าสุด</span>
+                                <button class="btn btn-sm btn-primary" onclick="viewAllReports()">
+                                    <i class="bi bi-list"></i> ดูทั้งหมด
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ห้อง</th>
+                                                <th>วิชา</th>
+                                                <th>ครูผู้สอน</th>
+                                                <th>เวลา</th>
+                                                <th>สถานะ</th>
+                                                <th>การจัดการ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentReports">
+                                            <!-- Data will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-bar-chart me-2"></i> อัตราการเข้าเรียนแยกรายวิชา
+                            </div>
+                            <div class="card-body">
+                                <canvas id="subjectChart" height="300"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- เอา "สรุปครูผู้สอน" ที่มีสถิติขาดสอนออก -->
+                        <!-- แทนที่ด้วยข้อมูลที่เป็นประโยชน์อื่น -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <i class="bi bi-calendar-check me-2"></i> สรุปการรายงานวันนี้
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ระดับชั้น</th>
+                                                <th>รายงานแล้ว</th>
+                                                <th>ยังไม่รายงาน</th>
+                                                <th>อัตราการรายงาน</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reportSummary">
+                                            <!-- Data will be populated by JavaScript -->
+                                            <tr>
+                                                <td>ม.1</td>
+                                                <td>4/4</td>
+                                                <td>0/4</td>
+                                                <td>100%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>ม.2</td>
+                                                <td>3/4</td>
+                                                <td>1/4</td>
+                                                <td>75%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>ม.3</td>
+                                                <td>4/4</td>
+                                                <td>0/4</td>
+                                                <td>100%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>ม.4</td>
+                                                <td>3/4</td>
+                                                <td>1/4</td>
+                                                <td>75%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>ม.5</td>
+                                                <td>2/4</td>
+                                                <td>2/4</td>
+                                                <td>50%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>ม.6</td>
+                                                <td>4/4</td>
+                                                <td>0/4</td>
+                                                <td>100%</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-lightning me-2"></i> การดำเนินการด่วน
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button class="btn btn-outline-primary" onclick="sendDailyReminders()">
+                                        <i class="bi bi-bell"></i> ส่งแจ้งเตือนรายวัน
+                                    </button>
+                                    <button class="btn btn-outline-success" onclick="generateMonthlyReport()">
+                                        <i class="bi bi-file-earmark-text"></i> สร้างรายงานเดือน
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="backupData()">
+                                        <i class="bi bi-cloud-arrow-up"></i> สำรองข้อมูล
+                                    </button>
+                                    <button class="btn btn-outline-warning" onclick="checkMissingReports()">
+                                        <i class="bi bi-exclamation-triangle"></i> ตรวจสอบรายงานหาย
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="viewStatisticalReport()">
+                                        <i class="bi bi-graph-up"></i> ดูรายงานสถิติ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-white border-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <span class="text-muted">พัฒนาโดยฝ่ายบริหารงานวิชาการ โรงเรียนสกลราชวิทยานุกูล</span>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="text-muted">© 2024 ระบบบันทึกการเรียนการสอน</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check session
+            if (!Auth.isAuthenticated() || Auth.getCurrentRole() !== 'admin') {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Initialize dashboard
+            window.dashboard = new Dashboard('admin');
+            
+            // Update user info in navbar
+            const user = Auth.getCurrentUser();
+            if (user) {
+                document.getElementById('navbarUser').textContent = user.name;
+            }
+        });
+        
+        // Global functions for buttons
+        function refreshDashboard() {
+            window.dashboard.loadDashboardData();
+            window.app.showToast('รีเฟรชข้อมูลสำเร็จ');
+        }
+        
+        function exportData(type) {
+            API.exportData(type).then(result => {
+                if (result.success) {
+                    API.downloadFile(result.data, result.filename);
+                    window.app.showToast('ดาวน์โหลดข้อมูลสำเร็จ');
+                } else {
+                    window.app.showToast('เกิดข้อผิดพลาดในการดาวน์โหลด', 'danger');
+                }
+            });
+        }
+        
+        function viewAllReports() {
+            window.location.href = 'history.html';
+        }
+        
+        async function sendDailyReminders() {
+            const result = await API.sendDailyReminders();
+            if (result.success) {
+                window.app.showToast(result.message);
+            } else {
+                window.app.showToast('เกิดข้อผิดพลาดในการส่งแจ้งเตือน', 'danger');
+            }
+        }
+        
+        function generateMonthlyReport() {
+            window.location.href = 'retrospective.html?type=monthly';
+        }
+        
+        async function backupData() {
+            const result = await API.backupData();
+            if (result.success) {
+                const backupStr = JSON.stringify(result.data, null, 2);
+                const blob = new Blob([backupStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                window.app.showToast('สำรองข้อมูลสำเร็จ');
+            } else {
+                window.app.showToast('เกิดข้อผิดพลาดในการสำรองข้อมูล', 'danger');
+            }
+        }
+        
+        async function checkMissingReports() {
+            const result = await API.getMissingReports();
+            if (result.success) {
+                if (result.data.length > 0) {
+                    alert(`มีห้องที่ยังไม่ได้รายงาน ${result.data.length} ห้อง`);
+                } else {
+                    alert('ทุกห้องได้รายงานเรียบร้อยแล้ว');
+                }
+            } else {
+                window.app.showToast('เกิดข้อผิดพลาดในการตรวจสอบ', 'danger');
+            }
+        }
+        
+        function viewStatisticalReport() {
+            window.location.href = 'statistical_report.html';
+        }
+    </script>
+</body>
+</html>

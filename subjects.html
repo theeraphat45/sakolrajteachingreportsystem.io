@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการวิชาเรียน | โรงเรียนสกลราชวิทยานุกูล</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-red: #C00000;
+            --secondary-red: #D32F2F;
+            --light-red: #FFEBEE;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --dark-gray: #495057;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+        }
+        
+        .bg-school-red {
+            background-color: var(--primary-red) !important;
+        }
+        
+        .text-school-red {
+            color: var(--primary-red) !important;
+        }
+        
+        .btn-school-red {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+        }
+        
+        .btn-school-red:hover {
+            background-color: var(--secondary-red);
+            color: white;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .management-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .subject-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary-red);
+            transition: all 0.3s;
+        }
+        
+        .subject-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            background-color: var(--white);
+            border-top: 1px solid #dee2e6;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+        
+        .table-subjects {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .table-subjects thead {
+            background-color: var(--primary-red);
+            color: white;
+        }
+        
+        .badge-level {
+            font-size: 0.8em;
+            padding: 5px 10px;
+        }
+        
+        .level-m1 { background-color: #e3f2fd; color: #1565c0; }
+        .level-m2 { background-color: #e8f5e9; color: #2e7d32; }
+        .level-m3 { background-color: #fff3e0; color: #ef6c00; }
+        .level-m4 { background-color: #f3e5f5; color: #7b1fa2; }
+        .level-m5 { background-color: #e0f2f1; color: #00695c; }
+        .level-m6 { background-color: #fff8e1; color: #f57f17; }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box .form-control {
+            padding-left: 40px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #6c757d;
+        }
+        
+        .action-buttons .btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#" id="dashboardLink">
+                <img src="assets/logo.png" alt="Logo" class="me-2">
+                <div>
+                    <div class="fw-bold text-school-red" style="line-height: 1.2;">ระบบบันทึกการเรียนการสอน</div>
+                    <small class="text-muted">โรงเรียนสกลราชวิทยานุกูล</small>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="report.html">
+                            <i class="bi bi-plus-circle text-school-red me-1"></i>เพิ่มรายงาน
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-2 text-school-red"></i>
+                            <span id="userName">ผู้ใช้งาน</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person me-2"></i>โปรไฟล์</a></li>
+                            <li><a class="dropdown-item" href="history.html"><i class="bi bi-clock-history me-2"></i>ประวัติรายงาน</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i>ออกจากระบบ</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-school-red mb-1">จัดการวิชาเรียน</h2>
+                    <p class="text-muted">เพิ่ม แก้ไข ลบ ข้อมูลวิชาเรียนทั้งหมด</p>
+                </div>
+                <div>
+                    <button class="btn btn-school-red" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                        <i class="bi bi-plus-circle me-2"></i>เพิ่มวิชาใหม่
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search and Filter -->
+            <div class="management-card">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text" class="form-control" placeholder="ค้นหาวิชาเรียน..." id="searchSubject">
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" id="filterLevel">
+                            <option value="all">ทุกระดับชั้น</option>
+                            <option value="m1">มัธยมศึกษาปีที่ 1</option>
+                            <option value="m2">มัธยมศึกษาปีที่ 2</option>
+                            <option value="m3">มัธยมศึกษาปีที่ 3</option>
+                            <option value="m4">มัธยมศึกษาปีที่ 4</option>
+                            <option value="m5">มัธยมศึกษาปีที่ 5</option>
+                            <option value="m6">มัธยมศึกษาปีที่ 6</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" id="filterType">
+                            <option value="all">ทุกกลุ่มสาระ</option>
+                            <option value="math">คณิตศาสตร์</option>
+                            <option value="science">วิทยาศาสตร์</option>
+                            <option value="english">ภาษาอังกฤษ</option>
+                            <option value="thai">ภาษาไทย</option>
+                            <option value="social">สังคมศึกษา</option>
+                            <option value="health">สุขศึกษาและพลศึกษา</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Subjects Table -->
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-school-red">รายการวิชาเรียนทั้งหมด</h5>
+                    <span class="badge bg-school-red" id="subjectCount">54 วิชา</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-subjects mb-0">
+                            <thead>
+                                <tr>
+                                    <th>รหัสวิชา</th>
+                                    <th>ชื่อวิชา</th>
+                                    <th>กลุ่มสาระ</th>
+                                    <th>ระดับชั้น</th>
+                                    <th>หน่วยกิต</th>
+                                    <th>จำนวนครู</th>
+                                    <th>จำนวนห้อง</th>
+                                    <th>การดำเนินการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectsTable">
+                                <!-- Math Subjects -->
+                                <tr>
+                                    <td><strong>ค32102</strong></td>
+                                    <td>คณิตศาสตร์ 4</td>
+                                    <td>คณิตศาสตร์</td>
+                                    <td>
+                                        <span class="badge badge-level level-m4">ม.4</span>
+                                        <span class="badge badge-level level-m5">ม.5</span>
+                                        <span class="badge badge-level level-m6">ม.6</span>
+                                    </td>
+                                    <td>1.5</td>
+                                    <td>8</td>
+                                    <td>15</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red" data-bs-toggle="modal" data-bs-target="#editSubjectModal">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('ค32102')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ค32202</strong></td>
+                                    <td>คณิตศาสตร์เพิ่มเติม 4</td>
+                                    <td>คณิตศาสตร์</td>
+                                    <td>
+                                        <span class="badge badge-level level-m4">ม.4</span>
+                                        <span class="badge badge-level level-m5">ม.5</span>
+                                    </td>
+                                    <td>1.0</td>
+                                    <td>5</td>
+                                    <td>8</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ค30292</strong></td>
+                                    <td>คณิตศาสตร์ พสวท.2</td>
+                                    <td>คณิตศาสตร์</td>
+                                    <td>
+                                        <span class="badge badge-level level-m6">ม.6</span>
+                                    </td>
+                                    <td>1.0</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ค30298</strong></td>
+                                    <td>โครงงานคณิตศาสตร์ 1</td>
+                                    <td>คณิตศาสตร์</td>
+                                    <td>
+                                        <span class="badge badge-level level-m4">ม.4</span>
+                                        <span class="badge badge-level level-m5">ม.5</span>
+                                    </td>
+                                    <td>1.0</td>
+                                    <td>4</td>
+                                    <td>6</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Science Subjects -->
+                                <tr>
+                                    <td><strong>ว32286</strong></td>
+                                    <td>สัมมนาวิทย์พลังสิบ</td>
+                                    <td>วิทยาศาสตร์</td>
+                                    <td>
+                                        <span class="badge badge-level level-m5">ม.5</span>
+                                        <span class="badge badge-level level-m6">ม.6</span>
+                                    </td>
+                                    <td>1.0</td>
+                                    <td>3</td>
+                                    <td>4</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ว30290</strong></td>
+                                    <td>โครงงานวิทยาศาสตร์ 1</td>
+                                    <td>วิทยาศาสตร์</td>
+                                    <td>
+                                        <span class="badge badge-level level-m4">ม.4</span>
+                                        <span class="badge badge-level level-m5">ม.5</span>
+                                    </td>
+                                    <td>1.0</td>
+                                    <td>6</td>
+                                    <td>10</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ว30284</strong></td>
+                                    <td>ความถนัดทางวิทย์ 2</td>
+                                    <td>วิทยาศาสตร์</td>
+                                    <td>
+                                        <span class="badge badge-level level-m6">ม.6</span>
+                                    </td>
+                                    <td>1.5</td>
+                                    <td>3</td>
+                                    <td>5</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ว32285</strong></td>
+                                    <td>เส้นทางนวัตกร</td>
+                                    <td>วิทยาศาสตร์</td>
+                                    <td>
+                                        <span class="badge badge-level level-m5">ม.5</span>
+                                    </td>
+                                    <td>1.0</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Other Subjects -->
+                                <tr>
+                                    <td><strong>อ30202</strong></td>
+                                    <td>ภาษาอังกฤษเพื่อการสื่อสาร</td>
+                                    <td>ภาษาอังกฤษ</td>
+                                    <td>
+                                        <span class="badge badge-level level-m4">ม.4</span>
+                                        <span class="badge badge-level level-m5">ม.5</span>
+                                        <span class="badge badge-level level-m6">ม.6</span>
+                                    </td>
+                                    <td>1.5</td>
+                                    <td>10</td>
+                                    <td>18</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ท30202</strong></td>
+                                    <td>ภาษาไทยเพื่ออาชีพ</td>
+                                    <td>ภาษาไทย</td>
+                                    <td>
+                                        <span class="badge badge-level level-m4">ม.4</span>
+                                        <span class="badge badge-level level-m5">ม.5</span>
+                                    </td>
+                                    <td>1.0</td>
+                                    <td>7</td>
+                                    <td>12</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <p class="mb-0 text-muted">แสดง 1-10 จาก 54 รายการ</p>
+                        </div>
+                        <div class="col-md-6">
+                            <nav aria-label="Page navigation" class="float-md-end">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#">ก่อนหน้า</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">ถัดไป</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Subject Groups Summary -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="management-card">
+                        <h5 class="fw-bold text-school-red mb-3">
+                            <i class="bi bi-pie-chart me-2"></i>สรุปวิชาตามกลุ่มสาระ
+                        </h5>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                คณิตศาสตร์
+                                <span class="badge bg-school-red rounded-pill">15 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                วิทยาศาสตร์
+                                <span class="badge bg-info rounded-pill">12 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                ภาษาอังกฤษ
+                                <span class="badge bg-success rounded-pill">8 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                ภาษาไทย
+                                <span class="badge bg-warning rounded-pill">7 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                สังคมศึกษา
+                                <span class="badge bg-purple rounded-pill">6 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                สุขศึกษาและพลศึกษา
+                                <span class="badge bg-danger rounded-pill">6 วิชา</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="management-card">
+                        <h5 class="fw-bold text-school-red mb-3">
+                            <i class="bi bi-bar-chart me-2"></i>สรุปวิชาตามระดับชั้น
+                        </h5>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                มัธยมศึกษาปีที่ 1
+                                <span class="badge bg-primary rounded-pill">8 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                มัธยมศึกษาปีที่ 2
+                                <span class="badge bg-success rounded-pill">9 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                มัธยมศึกษาปีที่ 3
+                                <span class="badge bg-warning rounded-pill">10 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                มัธยมศึกษาปีที่ 4
+                                <span class="badge bg-danger rounded-pill">12 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                มัธยมศึกษาปีที่ 5
+                                <span class="badge bg-info rounded-pill">8 วิชา</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                มัธยมศึกษาปีที่ 6
+                                <span class="badge bg-dark rounded-pill">7 วิชา</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">พัฒนาโดยฝ่ายบริหารงานวิชาการ โรงเรียนสกลราชวิทยานุกูล</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 text-muted">© 2024 สงวนลิขสิทธิ์</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Add Subject Modal -->
+    <div class="modal fade" id="addSubjectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-school-red">
+                        <i class="bi bi-plus-circle me-2"></i>เพิ่มวิชาเรียนใหม่
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addSubjectForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">รหัสวิชา</label>
+                                <input type="text" class="form-control" id="subjectCode" placeholder="เช่น ค32102" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ชื่อวิชา (ภาษาไทย)</label>
+                                <input type="text" class="form-control" id="subjectName" placeholder="เช่น คณิตศาสตร์ 4" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">กลุ่มสาระการเรียนรู้</label>
+                                <select class="form-select" id="subjectGroup" required>
+                                    <option value="">เลือกกลุ่มสาระ</option>
+                                    <option value="math">คณิตศาสตร์</option>
+                                    <option value="science">วิทยาศาสตร์</option>
+                                    <option value="english">ภาษาอังกฤษ</option>
+                                    <option value="thai">ภาษาไทย</option>
+                                    <option value="social">สังคมศึกษา</option>
+                                    <option value="health">สุขศึกษาและพลศึกษา</option>
+                                    <option value="art">ศิลปะ</option>
+                                    <option value="career">การงานอาชีพ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">หน่วยกิต</label>
+                                <select class="form-select" id="subjectCredit" required>
+                                    <option value="0.5">0.5</option>
+                                    <option value="1.0">1.0</option>
+                                    <option value="1.5" selected>1.5</option>
+                                    <option value="2.0">2.0</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">ระดับชั้นที่เปิดสอน</label>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="levelM1" value="m1">
+                                            <label class="form-check-label" for="levelM1">ม.1</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="levelM2" value="m2">
+                                            <label class="form-check-label" for="levelM2">ม.2</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="levelM3" value="m3">
+                                            <label class="form-check-label" for="levelM3">ม.3</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="levelM4" value="m4">
+                                            <label class="form-check-label" for="levelM4">ม.4</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="levelM5" value="m5">
+                                            <label class="form-check-label" for="levelM5">ม.5</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="levelM6" value="m6">
+                                            <label class="form-check-label" for="levelM6">ม.6</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">คำอธิบายวิชา</label>
+                                <textarea class="form-control" id="subjectDescription" rows="3" placeholder="คำอธิบายรายวิชา..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-school-red">เพิ่มวิชาเรียน</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Subject Modal -->
+    <div class="modal fade" id="editSubjectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-school-red">
+                        <i class="bi bi-pencil me-2"></i>แก้ไขข้อมูลวิชาเรียน
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editSubjectForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">รหัสวิชา</label>
+                                <input type="text" class="form-control" id="editSubjectCode" value="ค32102" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ชื่อวิชา (ภาษาไทย)</label>
+                                <input type="text" class="form-control" id="editSubjectName" value="คณิตศาสตร์ 4" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">กลุ่มสาระการเรียนรู้</label>
+                                <select class="form-select" id="editSubjectGroup" required>
+                                    <option value="math" selected>คณิตศาสตร์</option>
+                                    <option value="science">วิทยาศาสตร์</option>
+                                    <option value="english">ภาษาอังกฤษ</option>
+                                    <option value="thai">ภาษาไทย</option>
+                                    <option value="social">สังคมศึกษา</option>
+                                    <option value="health">สุขศึกษาและพลศึกษา</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">หน่วยกิต</label>
+                                <select class="form-select" id="editSubjectCredit" required>
+                                    <option value="0.5">0.5</option>
+                                    <option value="1.0">1.0</option>
+                                    <option value="1.5" selected>1.5</option>
+                                    <option value="2.0">2.0</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">ระดับชั้นที่เปิดสอน</label>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editLevelM1" value="m1">
+                                            <label class="form-check-label" for="editLevelM1">ม.1</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editLevelM2" value="m2">
+                                            <label class="form-check-label" for="editLevelM2">ม.2</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editLevelM3" value="m3">
+                                            <label class="form-check-label" for="editLevelM3">ม.3</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editLevelM4" value="m4" checked>
+                                            <label class="form-check-label" for="editLevelM4">ม.4</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editLevelM5" value="m5" checked>
+                                            <label class="form-check-label" for="editLevelM5">ม.5</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editLevelM6" value="m6" checked>
+                                            <label class="form-check-label" for="editLevelM6">ม.6</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">คำอธิบายวิชา</label>
+                                <textarea class="form-control" id="editSubjectDescription" rows="3">ศึกษาเกี่ยวกับแนวคิดพื้นฐานทางคณิตศาสตร์...</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-school-red">บันทึกการเปลี่ยนแปลง</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check session
+            const session = localStorage.getItem('userSession');
+            if (!session) {
+                window.location.href = 'login.html';
+            } else {
+                const userData = JSON.parse(session);
+                document.getElementById('userName').textContent = userData.name;
+                
+                // Set dashboard link based on role
+                const dashboardLink = document.getElementById('dashboardLink');
+                switch(userData.role) {
+                    case 'admin':
+                        dashboardLink.href = 'dashboard_admin.html';
+                        break;
+                    case 'teacher':
+                        dashboardLink.href = 'dashboard_teacher.html';
+                        break;
+                    case 'student':
+                        dashboardLink.href = 'dashboard_student.html';
+                        break;
+                    default:
+                        dashboardLink.href = 'index.html';
+                }
+            }
+            
+            // Search functionality
+            document.getElementById('searchSubject').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#subjectsTable tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Filter functionality
+            document.getElementById('filterLevel').addEventListener('change', applyFilters);
+            document.getElementById('filterType').addEventListener('change', applyFilters);
+            
+            function applyFilters() {
+                const level = document.getElementById('filterLevel').value;
+                const type = document.getElementById('filterType').value;
+                
+                // In a real app, this would filter the data
+                console.log('Filtering by:', {level, type});
+            }
+            
+            // Add subject form
+            document.getElementById('addSubjectForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real app, this would send data to the server
+                alert('เพิ่มวิชาเรียนเรียบร้อยแล้ว');
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addSubjectModal'));
+                modal.hide();
+                
+                // Reset form
+                this.reset();
+            });
+            
+            // Edit subject form
+            document.getElementById('editSubjectForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real app, this would send data to the server
+                alert('บันทึกการเปลี่ยนแปลงเรียบร้อยแล้ว');
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editSubjectModal'));
+                modal.hide();
+            });
+            
+            // Delete subject
+            window.confirmDelete = function(subjectCode) {
+                if (confirm(`คุณต้องการลบวิชา ${subjectCode} ใช่หรือไม่?`)) {
+                    alert(`ลบวิชา ${subjectCode} เรียบร้อยแล้ว`);
+                    // In a real app, this would send delete request to the server
+                }
+            };
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
+                    localStorage.removeItem('userSession');
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

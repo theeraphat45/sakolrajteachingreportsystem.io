@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายงานการเรียนการสอนย้อนหลัง - โรงเรียนสกลราชวิทยานุกูล</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.3.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.0"></script>
+    <style>
+        :root {
+            --primary-red: #C00000;
+            --secondary-red: #E60000;
+            --light-red: #FFF5F5;
+            --light-bg: #F8F9FA;
+            --white: #FFFFFF;
+            --success: #198754;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+        }
+        
+        body {
+            font-family: 'Sarabun', 'Prompt', sans-serif;
+            background-color: var(--light-bg);
+            color: #333;
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .sidebar {
+            background-color: var(--white);
+            min-height: calc(100vh - 56px);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: #333;
+            padding: 12px 20px;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: var(--light-bg);
+            border-left-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-red);
+            color: white;
+            font-weight: 500;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+        
+        .btn-primary:hover {
+            background-color: #A00000;
+            border-color: #A00000;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 25px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: var(--primary-red);
+        }
+        
+        .stat-card .number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--primary-red);
+            line-height: 1;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+        
+        .stat-card .sub-label {
+            color: #999;
+            font-size: 0.8em;
+        }
+        
+        .filter-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-mini-container {
+            position: relative;
+            height: 200px;
+            margin-bottom: 15px;
+        }
+        
+        .timeline-container {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 20px;
+            border-left: 3px solid var(--primary-red);
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--primary-red);
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--primary-red);
+        }
+        
+        .timeline-date {
+            color: var(--primary-red);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-content {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-card {
+            border-left: 5px solid;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: white;
+            border-radius: 8px;
+        }
+        
+        .comparison-better {
+            border-left-color: var(--success);
+        }
+        
+        .comparison-worse {
+            border-left-color: var(--danger);
+        }
+        
+        .comparison-same {
+            border-left-color: var(--info);
+        }
+        
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--danger);
+        }
+        
+        .trend-stable {
+            color: var(--info);
+        }
+        
+        .insight-card {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+            border: 1px solid #FFE0E0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .insight-icon {
+            font-size: 2em;
+            color: var(--primary-red);
+            margin-bottom: 15px;
+        }
+        
+        .period-comparison {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .period-left, .period-right {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .period-divider {
+            width: 1px;
+            height: 80px;
+            background-color: #dee2e6;
+            margin: 0 20px;
+        }
+        
+        .period-title {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .period-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-red);
+        }
+        
+        .period-change {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .improvement-badge {
+            background-color: var(--success);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        
+        .decline-badge {
+            background-color: var(--danger);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        
+        .print-only {
+            display: none;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFE0E0 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--primary-red);
+        }
+        
+        .month-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .month-btn {
+            padding: 8px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 20px;
+            background-color: white;
+            color: #666;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .month-btn:hover {
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+        
+        .month-btn.active {
+            background-color: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
+        }
+        
+        .year-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .year-card {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .year-title {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .year-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-red);
+        }
+        
+        .year-change {
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm no-print">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="assets/logo.png" alt="โรงเรียนสกลราชวิทยานุกูล">
+                <span class="fw-bold" style="color: var(--primary-red);">ระบบบันทึกการเรียนการสอน<br><small>โรงเรียนสกลราชวิทยานุกูล</small></span>
+            </a>
+            <div class="navbar-nav ms-auto align-items-center">
+                <span class="nav-item me-3">
+                    <span id="navbarUser"></span>
+                    <span class="role-badge" id="userRoleBadge"></span>
+                </span>
+                <a href="#" id="dashboardLink" class="nav-link me-3">
+                    <i class="bi bi-speedometer2"></i> แดชบอร์ด
+                </a>
+                <a href="#" id="logoutBtn" class="nav-link btn btn-outline-danger">
+                    <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Print Header (Visible only when printing) -->
+    <div class="print-only container-fluid mb-4">
+        <div class="row">
+            <div class="col-12 text-center">
+                <img src="assets/logo.png" alt="โรงเรียนสกลราชวิทยานุกูล" style="height: 60px;">
+                <h3 class="mt-2">โรงเรียนสกลราชวิทยานุกูล</h3>
+                <h4>รายงานการเรียนการสอนย้อนหลัง</h4>
+                <p>รายงานวันที่: <span id="printDate"></span></p>
+                <hr>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 col-lg-2 d-md-block sidebar collapse p-0 no-print">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="dashboardNavLink">
+                                <i class="bi bi-speedometer2 me-2"></i> แดชบอร์ด
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="report.html">
+                                <i class="bi bi-clipboard-check me-2"></i> รายงานการสอน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="history.html">
+                                <i class="bi bi-clock-history me-2"></i> ประวัติรายงาน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="statistical_report.html">
+                                <i class="bi bi-graph-up me-2"></i> สถิติและรายงาน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="retrospective.html">
+                                <i class="bi bi-calendar-month me-2"></i> รายงานย้อนหลัง
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="teacher_absence.html">
+                                <i class="bi bi-person-dash me-2"></i> สถิติครูขาดสอน
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.html">
+                                <i class="bi bi-person-circle me-2"></i> โปรไฟล์
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 col-lg-10 ms-sm-auto px-md-4">
+                <!-- Header -->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom no-print">
+                    <h1 class="h2"><i class="bi bi-calendar-month me-2"></i> รายงานการเรียนการสอนย้อนหลัง</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="generateRetrospectivePDF()">
+                                <i class="bi bi-file-earmark-pdf"></i> PDF
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success" onclick="exportRetrospectiveExcel()">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                                <i class="bi bi-printer"></i> พิมพ์
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="refreshRetrospectiveData()">
+                            <i class="bi bi-arrow-clockwise"></i> รีเฟรช
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-card no-print">
+                    <h5><i class="bi bi-funnel me-2"></i> กรองข้อมูลย้อนหลัง</h5>
+                    <form id="retrospectiveFilterForm">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="retrospectiveType" class="form-label">ประเภทการวิเคราะห์</label>
+                                <select class="form-select" id="retrospectiveType">
+                                    <option value="monthly">รายเดือน</option>
+                                    <option value="quarterly">รายไตรมาส</option>
+                                    <option value="semester">รายภาคเรียน</option>
+                                    <option value="yearly">รายปีการศึกษา</option>
+                                    <option value="custom">กำหนดเอง</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="retrospectiveStart" class="form-label">ช่วงเริ่มต้น</label>
+                                <input type="date" class="form-control" id="retrospectiveStart">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="retrospectiveEnd" class="form-label">ช่วงสิ้นสุด</label>
+                                <input type="date" class="form-control" id="retrospectiveEnd">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="compareWith" class="form-label">เปรียบเทียบกับ</label>
+                                <select class="form-select" id="compareWith">
+                                    <option value="previous_period">ช่วงก่อนหน้า</option>
+                                    <option value="same_period_last_year">ช่วงเดียวกันปีที่แล้ว</option>
+                                    <option value="year_to_date">ปีนี้ถึงปัจจุบัน</option>
+                                    <option value="none">ไม่เปรียบเทียบ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="bi bi-search"></i> วิเคราะห์ข้อมูล
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="resetRetrospectiveFilters()">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Month Selector -->
+                <div class="card no-print" id="monthSelectorCard">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i> เลือกเดือนที่ต้องการวิเคราะห์</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="month-selector" id="monthSelector">
+                            <!-- Months will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-calendar-range"></i>
+                            <div class="number" id="retroPeriod">เดือนนี้</div>
+                            <div class="label">ช่วงเวลาที่วิเคราะห์</div>
+                            <div class="sub-label" id="retroDates"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-bar-chart"></i>
+                            <div class="number" id="retroAttendance">0%</div>
+                            <div class="label">อัตราการเข้าเรียนเฉลี่ย</div>
+                            <div class="sub-label" id="retroAttendanceChange"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-graph-down"></i>
+                            <div class="number" id="retroAbsence">0%</div>
+                            <div class="label">อัตราการขาดเรียนเฉลี่ย</div>
+                            <div class="sub-label" id="retroAbsenceChange"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-arrow-up-right"></i>
+                            <div class="number" id="retroImprovement">0%</div>
+                            <div class="label">การพัฒนารวม</div>
+                            <div class="sub-label">เทียบกับช่วงก่อนหน้า</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Period Comparison -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i> การเปรียบเทียบระหว่างช่วงเวลา</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="period-comparison">
+                            <div class="period-left">
+                                <div class="period-title" id="period1Title">เดือนก่อนหน้า</div>
+                                <div class="period-value" id="period1Value">0%</div>
+                                <div class="period-change" id="period1Change">การเข้าเรียนเฉลี่ย</div>
+                            </div>
+                            <div class="period-divider"></div>
+                            <div class="period-right">
+                                <div class="period-title" id="period2Title">เดือนนี้</div>
+                                <div class="period-value" id="period2Value">0%</div>
+                                <div class="period-change" id="period2Change">การเข้าเรียนเฉลี่ย</div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h6 id="comparisonResult">การเปลี่ยนแปลง: <span id="changePercentage">0%</span></h6>
+                            <p class="text-muted" id="comparisonInterpretation">กำลังวิเคราะห์ข้อมูล...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs no-print" id="retrospectiveTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                            <i class="bi bi-eye me-1"></i> ภาพรวม
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="trends-tab" data-bs-toggle="tab" data-bs-target="#trends" type="button" role="tab">
+                            <i class="bi bi-graph-up me-1"></i> แนวโน้ม
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab">
+                            <i class="bi bi-arrow-left-right me-1"></i> การเปรียบเทียบ
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="insights-tab" data-bs-toggle="tab" data-bs-target="#insights" type="button" role="tab">
+                            <i class="bi bi-lightbulb me-1"></i> ข้อค้นพบ
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="timeline-tab" data-bs-toggle="tab" data-bs-target="#timeline" type="button" role="tab">
+                            <i class="bi bi-clock-history me-1"></i> ไทม์ไลน์
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="retrospectiveTabsContent">
+                    <!-- Tab 1: Overview -->
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                        <!-- Year Comparison -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-calendar-year me-2"></i> เปรียบเทียบรายปี</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="year-comparison" id="yearComparison">
+                                    <!-- Year cards will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Charts -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i> แนวโน้มอัตราการเข้าเรียน</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="attendanceTrendChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i> การกระจายตามระดับชั้น</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="gradeDistributionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Monthly Performance -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-calendar-month me-2"></i> ประสิทธิภาพรายเดือน</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>เดือน</th>
+                                                <th>คาบเรียนทั้งหมด</th>
+                                                <th>สอนปกติ</th>
+                                                <th>ผู้สอนแทน</th>
+                                                <th>ไม่มีผู้สอน</th>
+                                                <th>กิจกรรม</th>
+                                                <th>อัตราการเข้าเรียน</th>
+                                                <th>การเปลี่ยนแปลง</th>
+                                                <th>สถานะ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="monthlyPerformanceTable">
+                                            <!-- Data will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Trends -->
+                    <div class="tab-pane fade" id="trends" role="tabpanel">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i> แนวโน้มการเข้าเรียน 12 เดือน</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="yearlyTrendChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-activity me-2"></i> ความผันผวนรายสัปดาห์</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="weeklyFluctuationChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seasonal Analysis -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-sun me-2"></i> การวิเคราะห์ตามฤดูกาล</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="chart-mini-container">
+                                            <canvas id="seasonalPatternChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="insight-card">
+                                            <div class="insight-icon">
+                                                <i class="bi bi-bar-chart"></i>
+                                            </div>
+                                            <h6>รูปแบบตามฤดูกาล</h6>
+                                            <p id="seasonalInsights">กำลังวิเคราะห์รูปแบบตามฤดูกาล...</p>
+                                            <div class="mt-3">
+                                                <h6>ช่วงเวลาที่ต้องการการดูแล:</h6>
+                                                <ul id="criticalPeriods">
+                                                    <!-- Critical periods will be listed here -->
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Teacher Trends -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i> แนวโน้มครูผู้สอน</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="teacherTrendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Comparison -->
+                    <div class="tab-pane fade" id="comparison" role="tabpanel">
+                        <!-- Comparison Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="comparison-card comparison-better">
+                                    <h6><i class="bi bi-arrow-up-circle me-2"></i> ด้านที่พัฒนาขึ้น</h6>
+                                    <div id="improvementAreas">
+                                        <!-- Improvement areas will be listed here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="comparison-card comparison-worse">
+                                    <h6><i class="bi bi-arrow-down-circle me-2"></i> ด้านที่ต้องปรับปรุง</h6>
+                                    <div id="declineAreas">
+                                        <!-- Decline areas will be listed here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="comparison-card comparison-same">
+                                    <h6><i class="bi bi-dash-circle me-2"></i> ด้านที่คงที่</h6>
+                                    <div id="stableAreas">
+                                        <!-- Stable areas will be listed here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Comparison -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-table me-2"></i> การเปรียบเทียบอย่างละเอียด</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ตัวชี้วัด</th>
+                                                <th id="comparisonPeriod1">เดือนก่อนหน้า</th>
+                                                <th id="comparisonPeriod2">เดือนนี้</th>
+                                                <th>การเปลี่ยนแปลง</th>
+                                                <th>ร้อยละ</th>
+                                                <th>สถานะ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="detailedComparisonTable">
+                                            <!-- Comparison data will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grade Level Comparison -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-building me-2"></i> การเปรียบเทียบตามระดับชั้น</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="gradeComparisonChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Insights -->
+                    <div class="tab-pane fade" id="insights" role="tabpanel">
+                        <!-- Key Insights -->
+                        <div class="highlight-box mb-4">
+                            <h4><i class="bi bi-star me-2"></i> ข้อค้นพบสำคัญ</h4>
+                            <div id="keyInsights">
+                                <!-- Key insights will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Insights Grid -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="insight-card">
+                                    <div class="insight-icon">
+                                        <i class="bi bi-trophy"></i>
+                                    </div>
+                                    <h6>ความสำเร็จที่โดดเด่น</h6>
+                                    <div id="successStories">
+                                        <!-- Success stories will be listed here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="insight-card">
+                                    <div class="insight-icon">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                    </div>
+                                    <h6>ประเด็นที่ต้องแก้ไข</h6>
+                                    <div id="issuesToAddress">
+                                        <!-- Issues will be listed here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="insight-card">
+                                    <div class="insight-icon">
+                                        <i class="bi bi-lightbulb"></i>
+                                    </div>
+                                    <h6>โอกาสในการพัฒนา</h6>
+                                    <div id="developmentOpportunities">
+                                        <!-- Development opportunities will be listed here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="insight-card">
+                                    <div class="insight-icon">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                    </div>
+                                    <h6>แนวโน้มในอนาคต</h6>
+                                    <div id="futureTrends">
+                                        <!-- Future trends will be listed here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recommendations -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i> ข้อเสนอแนะ</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>ข้อเสนอแนะระยะสั้น</h6>
+                                        <ul id="shortTermRecommendations">
+                                            <!-- Short-term recommendations will be listed here -->
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>ข้อเสนอแนะระยะยาว</h6>
+                                        <ul id="longTermRecommendations">
+                                            <!-- Long-term recommendations will be listed here -->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 5: Timeline -->
+                    <div class="tab-pane fade" id="timeline" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i> ไทม์ไลน์การพัฒนาการเรียนการสอน</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="timeline-container" id="developmentTimeline">
+                                    <!-- Timeline items will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Milestones -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-flag me-2"></i> จุดสำคัญ</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row" id="milestonesGrid">
+                                    <!-- Milestones will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Print Summary -->
+                <div class="card mt-4 print-only">
+                    <div class="card-header">
+                        <h5><i class="bi bi-file-text me-2"></i> สรุปรายงานย้อนหลัง</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>สรุปข้อมูลช่วงเวลา</h6>
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>ช่วงเวลาที่วิเคราะห์:</td>
+                                            <td id="printPeriod"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>อัตราการเข้าเรียนเฉลี่ย:</td>
+                                            <td id="printAttendance"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>อัตราการขาดเรียนเฉลี่ย:</td>
+                                            <td id="printAbsence"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>การเปลี่ยนแปลงจากช่วงก่อน:</td>
+                                            <td id="printChange"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>ข้อค้นพบสำคัญ</h6>
+                                <div id="printInsights">
+                                    <!-- Insights will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>ข้อเสนอแนะ:</h6>
+                            <textarea class="form-control" rows="4" id="printRecommendations" placeholder="กรอกข้อเสนอแนะ..."></textarea>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <p>ผู้จัดทำรายงาน: _________________________________</p>
+                            <p>วันที่จัดทำ: <span id="printCurrentDate"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-white border-top no-print">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <span class="text-muted">พัฒนาโดยฝ่ายบริหารงานวิชาการ โรงเรียนสกลราชวิทยานุกูล</span>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="text-muted">© 2024 ระบบบันทึกการเรียนการสอน</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.3.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.0"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    
+    <!-- Retrospective Report JavaScript -->
+    <script>
+        // Global variables
+        let currentUser = null;
+        let currentRole = null;
+        let retrospectiveData = {};
+        let charts = {};
+        let selectedMonth = null;
+        
+        // Month names in Thai
+        const thaiMonths = [
+            'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
+            'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
+            'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+        ];
+        
+        // Academic months (May - April)
+        const academicMonths = [
+            'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.',
+            'พ.ย.', 'ธ.ค.', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.'
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check session
+            currentUser = Auth.getCurrentUser();
+            currentRole = Auth.getCurrentRole();
+            
+            if (!currentUser || !currentRole) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Update UI based on role
+            updateUIForRole();
+            
+            // Set default dates
+            setDefaultDates();
+            
+            // Initialize month selector
+            initializeMonthSelector();
+            
+            // Load initial data (current month)
+            loadRetrospectiveData('current');
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Set print date
+            const now = new Date();
+            document.getElementById('printDate').textContent = now.toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('printCurrentDate').textContent = now.toLocaleDateString('th-TH');
+        });
+        
+        function updateUIForRole() {
+            // Update navbar
+            document.getElementById('navbarUser').textContent = currentUser.name;
+            
+            let roleText = '';
+            let dashboardLink = '';
+            
+            switch(currentRole) {
+                case 'admin':
+                    roleText = 'ผู้ดูแลระบบ';
+                    dashboardLink = 'dashboard_admin.html';
+                    break;
+                case 'teacher':
+                    roleText = 'ครูผู้สอน';
+                    dashboardLink = 'dashboard_teacher.html';
+                    break;
+                case 'student':
+                    roleText = 'ตัวแทนห้อง';
+                    dashboardLink = 'dashboard_student.html';
+                    break;
+            }
+            
+            document.getElementById('userRoleBadge').textContent = roleText;
+            document.getElementById('dashboardLink').href = dashboardLink;
+            document.getElementById('dashboardNavLink').href = dashboardLink;
+        }
+        
+        function setDefaultDates() {
+            const now = new Date();
+            const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            
+            // Format dates as YYYY-MM-DD
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            
+            document.getElementById('retrospectiveStart').value = formatDate(firstDayOfMonth);
+            document.getElementById('retrospectiveEnd').value = formatDate(lastDayOfMonth);
+        }
+        
+        function initializeMonthSelector() {
+            const container = document.getElementById('monthSelector');
+            const now = new Date();
+            
+            // Generate buttons for current and previous 11 months
+            for (let i = 11; i >= 0; i--) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const month = date.getMonth();
+                const year = date.getFullYear() + 543; // Convert to Buddhist year
+                const monthName = thaiMonths[month];
+                
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'month-btn';
+                button.textContent = `${monthName} ${year}`;
+                button.dataset.month = month;
+                button.dataset.year = date.getFullYear();
+                
+                // Mark current month as active
+                if (i === 0) {
+                    button.classList.add('active');
+                    selectedMonth = {
+                        month: month,
+                        year: date.getFullYear(),
+                        name: monthName
+                    };
+                }
+                
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.month-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Update selected month
+                    selectedMonth = {
+                        month: parseInt(this.dataset.month),
+                        year: parseInt(this.dataset.year),
+                        name: this.textContent
+                    };
+                    
+                    // Load data for selected month
+                    loadRetrospectiveData('specific', {
+                        month: selectedMonth.month,
+                        year: selectedMonth.year
+                    });
+                });
+                
+                container.appendChild(button);
+            }
+        }
+        
+        async function loadRetrospectiveData(type, params = {}) {
+            try {
+                window.app.showLoading();
+                
+                // Get filter values
+                const filters = getFilters();
+                
+                // Load retrospective data based on type
+                switch(type) {
+                    case 'current':
+                        await loadCurrentMonthData(filters);
+                        break;
+                    case 'specific':
+                        await loadSpecificMonthData(params.month, params.year);
+                        break;
+                    case 'custom':
+                        await loadCustomPeriodData(filters);
+                        break;
+                }
+                
+                // Load comparison data if needed
+                const compareWith = document.getElementById('compareWith').value;
+                if (compareWith !== 'none') {
+                    await loadComparisonData(compareWith);
+                }
+                
+                // Update all displays
+                updateRetrospectiveDisplay();
+                updateComparisonDisplay();
+                
+                // Initialize charts
+                initializeRetrospectiveCharts();
+                
+                window.app.hideLoading();
+            } catch (error) {
+                console.error('Error loading retrospective data:', error);
+                window.app.hideLoading();
+                window.app.showToast('เกิดข้อผิดพลาดในการโหลดข้อมูลย้อนหลัง', 'danger');
+            }
+        }
+        
+        function getFilters() {
+            const type = document.getElementById('retrospectiveType').value;
+            const startDate = document.getElementById('retrospectiveStart').value;
+            const endDate = document.getElementById('retrospectiveEnd').value;
+            const compareWith = document.getElementById('compareWith').value;
+            
+            return {
+                type: type,
+                startDate: startDate,
+                endDate: endDate,
+                compareWith: compareWith
+            };
+        }
+        
+        async function loadCurrentMonthData(filters) {
+            // Generate sample data for current month
+            retrospectiveData.current = generateMonthData(new Date().getMonth(), new Date().getFullYear());
+            retrospectiveData.summary = generateSummaryData();
+        }
+        
+        async function loadSpecificMonthData(month, year) {
+            // Generate sample data for specific month
+            retrospectiveData.current = generateMonthData(month, year);
+            retrospectiveData.summary = generateSummaryData();
+            
+            // Update period display
+            document.getElementById('retroPeriod').textContent = thaiMonths[month] + ' ' + (year + 543);
+            document.getElementById('retroDates').textContent = `1 - ${new Date(year, month + 1, 0).getDate()} ${thaiMonths[month]}`;
+        }
+        
+        async function loadCustomPeriodData(filters) {
+            // Generate sample data for custom period
+            retrospectiveData.current = generateCustomPeriodData(filters);
+            retrospectiveData.summary = generateSummaryData();
+        }
+        
+        async function loadComparisonData(compareType) {
+            // Generate comparison data based on comparison type
+            retrospectiveData.comparison = generateComparisonData(compareType);
+        }
+        
+        function generateMonthData(month, year) {
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const monthName = thaiMonths[month];
+            
+            // Generate daily data
+            const dailyData = [];
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dayOfWeek = date.getDay();
+                const dayName = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'][dayOfWeek];
+                
+                // Skip weekends for school days
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    const totalClasses = 40 + Math.floor(Math.random() * 20);
+                    const normalClasses = 35 + Math.floor(Math.random() * 10);
+                    const substituteClasses = 2 + Math.floor(Math.random() * 3);
+                    const absentClasses = 1 + Math.floor(Math.random() * 3);
+                    const activityClasses = Math.floor(Math.random() * 2);
+                    
+                    const attendanceRate = ((normalClasses + substituteClasses) / totalClasses * 100).toFixed(1);
+                    
+                    dailyData.push({
+                        date: `${day} ${monthName}`,
+                        day: dayName,
+                        totalClasses: totalClasses,
+                        normalClasses: normalClasses,
+                        substituteClasses: substituteClasses,
+                        absentClasses: absentClasses,
+                        activityClasses: activityClasses,
+                        attendanceRate: parseFloat(attendanceRate)
+                    });
+                }
+            }
+            
+            // Generate grade level data
+            const gradeData = [
+                { grade: 'ม.1', attendanceRate: 95.2 + Math.random() * 3 },
+                { grade: 'ม.2', attendanceRate: 94.8 + Math.random() * 3 },
+                { grade: 'ม.3', attendanceRate: 96.1 + Math.random() * 3 },
+                { grade: 'ม.4', attendanceRate: 93.5 + Math.random() * 3 },
+                { grade: 'ม.5', attendanceRate: 95.8 + Math.random() * 3 },
+                { grade: 'ม.6', attendanceRate: 97.2 + Math.random() * 2 }
+            ];
+            
+            // Generate teacher data
+            const teacherData = [
+                { teacher: 'ครูวีระพล', attendanceRate: 98.5 },
+                { teacher: 'ครูรุจิพัชญ์', attendanceRate: 97.8 },
+                { teacher: 'ครูผุสดี', attendanceRate: 96.3 },
+                { teacher: 'ครูสมชาย', attendanceRate: 95.2 },
+                { teacher: 'ครูสมหมาย', attendanceRate: 94.8 },
+                { teacher: 'ครูใหม่', attendanceRate: 93.5 }
+            ];
+            
+            // Calculate summary
+            const totalClasses = dailyData.reduce((sum, day) => sum + day.totalClasses, 0);
+            const normalClasses = dailyData.reduce((sum, day) => sum + day.normalClasses, 0);
+            const substituteClasses = dailyData.reduce((sum, day) => sum + day.substituteClasses, 0);
+            const absentClasses = dailyData.reduce((sum, day) => sum + day.absentClasses, 0);
+            const avgAttendanceRate = (normalClasses + substituteClasses) / totalClasses * 100;
+            
+            return {
+                month: month,
+                year: year,
+                monthName: monthName,
+                dailyData: dailyData,
+                gradeData: gradeData,
+                teacherData: teacherData,
+                summary: {
+                    totalClasses: totalClasses,
+                    normalClasses: normalClasses,
+                    substituteClasses: substituteClasses,
+                    absentClasses: absentClasses,
+                    avgAttendanceRate: parseFloat(avgAttendanceRate.toFixed(1)),
+                    totalDays: dailyData.length
+                }
+            };
+        }
+        
+        function generateSummaryData() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            // Generate monthly data for the past 12 months
+            const monthlyData = [];
+            for (let i = 11; i >= 0; i--) {
+                const date = new Date(currentYear, now.getMonth() - i, 1);
+                const month = date.getMonth();
+                const year = date.getFullYear();
+                
+                const data = generateMonthData(month, year);
+                monthlyData.push({
+                    month: month,
+                    year: year,
+                    monthName: academicMonths[month],
+                    attendanceRate: data.summary.avgAttendanceRate,
+                    totalClasses: data.summary.totalClasses,
+                    absentClasses: data.summary.absentClasses
+                });
+            }
+            
+            // Generate yearly comparison data
+            const yearlyData = [];
+            for (let year = currentYear - 2; year <= currentYear; year++) {
+                let totalAttendance = 0;
+                let totalClasses = 0;
+                
+                // Average of 12 months for each year
+                for (let month = 0; month < 12; month++) {
+                    const data = generateMonthData(month, year);
+                    totalAttendance += data.summary.avgAttendanceRate;
+                    totalClasses += data.summary.totalClasses;
+                }
+                
+                yearlyData.push({
+                    year: year + 543, // Buddhist year
+                    attendanceRate: parseFloat((totalAttendance / 12).toFixed(1)),
+                    totalClasses: totalClasses,
+                    avgMonthlyClasses: Math.round(totalClasses / 12)
+                });
+            }
+            
+            return {
+                monthlyData: monthlyData,
+                yearlyData: yearlyData,
+                currentYear: currentYear,
+                previousYear: currentYear - 1
+            };
+        }
+        
+        function generateCustomPeriodData(filters) {
+            // This would generate data for custom period
+            // For demo, use current month data
+            return generateMonthData(new Date().getMonth(), new Date().getFullYear());
+        }
+        
+        function generateComparisonData(compareType) {
+            const now = new Date();
+            let comparisonData = null;
+            
+            switch(compareType) {
+                case 'previous_period':
+                    // Compare with previous month
+                    const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    comparisonData = {
+                        type: 'previous_period',
+                        period1: generateMonthData(prevMonth.getMonth(), prevMonth.getFullYear()),
+                        period2: retrospectiveData.current,
+                        period1Label: thaiMonths[prevMonth.getMonth()] + ' ' + (prevMonth.getFullYear() + 543),
+                        period2Label: thaiMonths[now.getMonth()] + ' ' + (now.getFullYear() + 543)
+                    };
+                    break;
+                    
+                case 'same_period_last_year':
+                    // Compare with same month last year
+                    const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+                    comparisonData = {
+                        type: 'same_period_last_year',
+                        period1: generateMonthData(lastYear.getMonth(), lastYear.getFullYear()),
+                        period2: retrospectiveData.current,
+                        period1Label: thaiMonths[lastYear.getMonth()] + ' ' + (lastYear.getFullYear() + 543),
+                        period2Label: thaiMonths[now.getMonth()] + ' ' + (now.getFullYear() + 543)
+                    };
+                    break;
+                    
+                case 'year_to_date':
+                    // Compare year to date with previous year
+                    comparisonData = {
+                        type: 'year_to_date',
+                        period1: generateYearToDateData(now.getFullYear() - 1),
+                        period2: generateYearToDateData(now.getFullYear()),
+                        period1Label: 'ปี ' + (now.getFullYear() + 542),
+                        period2Label: 'ปี ' + (now.getFullYear() + 543)
+                    };
+                    break;
+            }
+            
+            // Calculate comparison metrics
+            if (comparisonData && comparisonData.period1 && comparisonData.period2) {
+                const rate1 = comparisonData.period1.summary.avgAttendanceRate;
+                const rate2 = comparisonData.period2.summary.avgAttendanceRate;
+                const change = rate2 - rate1;
+                const changePercent = rate1 > 0 ? ((change / rate1) * 100).toFixed(1) : 0;
+                
+                comparisonData.metrics = {
+                    attendanceRate1: rate1,
+                    attendanceRate2: rate2,
+                    change: change,
+                    changePercent: parseFloat(changePercent),
+                    trend: change > 0 ? 'up' : change < 0 ? 'down' : 'stable',
+                    interpretation: getInterpretation(change)
+                };
+            }
+            
+            return comparisonData;
+        }
+        
+        function generateYearToDateData(year) {
+            const now = new Date();
+            let totalAttendance = 0;
+            let totalClasses = 0;
+            let monthCount = 0;
+            
+            // Sum data from January to current month
+            for (let month = 0; month <= now.getMonth(); month++) {
+                const data = generateMonthData(month, year);
+                totalAttendance += data.summary.avgAttendanceRate;
+                totalClasses += data.summary.totalClasses;
+                monthCount++;
+            }
+            
+            return {
+                summary: {
+                    avgAttendanceRate: parseFloat((totalAttendance / monthCount).toFixed(1)),
+                    totalClasses: totalClasses
+                }
+            };
+        }
+        
+        function getInterpretation(change) {
+            if (change > 2) return 'พัฒนาขึ้นอย่างมีนัยสำคัญ';
+            if (change > 0.5) return 'พัฒนาขึ้นเล็กน้อย';
+            if (change > -0.5) return 'คงที่';
+            if (change > -2) return 'ลดลงเล็กน้อย';
+            return 'ลดลงอย่างมีนัยสำคัญ';
+        }
+        
+        function updateRetrospectiveDisplay() {
+            const current = retrospectiveData.current;
+            const summary = retrospectiveData.summary;
+            
+            if (!current || !summary) return;
+            
+            // Update summary cards
+            document.getElementById('retroAttendance').textContent = `${current.summary.avgAttendanceRate}%`;
+            document.getElementById('retroAbsence').textContent = `${((current.summary.absentClasses / current.summary.totalClasses) * 100).toFixed(1)}%`;
+            
+            // Update monthly performance table
+            updateMonthlyPerformanceTable(summary.monthlyData);
+            
+            // Update year comparison
+            updateYearComparison(summary.yearlyData);
+            
+            // Update print version
+            document.getElementById('printPeriod').textContent = `${current.monthName} ${current.year + 543}`;
+            document.getElementById('printAttendance').textContent = `${current.summary.avgAttendanceRate}%`;
+            document.getElementById('printAbsence').textContent = `${((current.summary.absentClasses / current.summary.totalClasses) * 100).toFixed(1)}%`;
+        }
+        
+        function updateComparisonDisplay() {
+            const comparison = retrospectiveData.comparison;
+            
+            if (!comparison) {
+                // Hide comparison elements if no comparison data
+                document.getElementById('period1Title').textContent = 'ไม่มีข้อมูล';
+                document.getElementById('period1Value').textContent = '-';
+                document.getElementById('period2Title').textContent = 'ไม่มีข้อมูล';
+                document.getElementById('period2Value').textContent = '-';
+                return;
+            }
+            
+            const metrics = comparison.metrics;
+            
+            // Update period comparison
+            document.getElementById('period1Title').textContent = comparison.period1Label;
+            document.getElementById('period1Value').textContent = `${metrics.attendanceRate1}%`;
+            document.getElementById('period1Change').textContent = 'อัตราการเข้าเรียนเฉลี่ย';
+            
+            document.getElementById('period2Title').textContent = comparison.period2Label;
+            document.getElementById('period2Value').textContent = `${metrics.attendanceRate2}%`;
+            document.getElementById('period2Change').textContent = 'อัตราการเข้าเรียนเฉลี่ย';
+            
+            // Update comparison result
+            const changeElement = document.getElementById('changePercentage');
+            const interpretationElement = document.getElementById('comparisonInterpretation');
+            
+            changeElement.textContent = `${metrics.change >= 0 ? '+' : ''}${metrics.change.toFixed(1)}%`;
+            changeElement.className = metrics.trend === 'up' ? 'trend-up' : 
+                                     metrics.trend === 'down' ? 'trend-down' : 'trend-stable';
+            
+            interpretationElement.textContent = metrics.interpretation;
+            
+            // Update improvement card
+            document.getElementById('retroImprovement').textContent = `${metrics.change >= 0 ? '+' : ''}${metrics.changePercent}%`;
+            
+            // Update attendance change
+            const attendanceChange = document.getElementById('retroAttendanceChange');
+            attendanceChange.textContent = `${metrics.change >= 0 ? 'เพิ่มขึ้น' : 'ลดลง'} ${Math.abs(metrics.change).toFixed(1)}%`;
+            attendanceChange.className = metrics.trend === 'up' ? 'trend-up' : 
+                                       metrics.trend === 'down' ? 'trend-down' : 'trend-stable';
+            
+            // Update absence change (assuming similar trend)
+            const absenceChange = document.getElementById('retroAbsenceChange');
+            absenceChange.textContent = `${metrics.change >= 0 ? 'ลดลง' : 'เพิ่มขึ้น'} ${Math.abs(metrics.change).toFixed(1)}%`;
+            absenceChange.className = metrics.trend === 'up' ? 'trend-down' : 
+                                     metrics.trend === 'down' ? 'trend-up' : 'trend-stable';
+            
+            // Update print change
+            document.getElementById('printChange').textContent = `${metrics.change >= 0 ? 'เพิ่มขึ้น' : 'ลดลง'} ${Math.abs(metrics.change).toFixed(1)}%`;
+            
+            // Update comparison table headers
+            document.getElementById('comparisonPeriod1').textContent = comparison.period1Label;
+            document.getElementById('comparisonPeriod2').textContent = comparison.period2Label;
+            
+            // Update detailed comparison table
+            updateDetailedComparisonTable(comparison);
+            
+            // Update comparison areas
+            updateComparisonAreas(comparison);
+        }
+        
+        function updateMonthlyPerformanceTable(monthlyData) {
+            const table = document.getElementById('monthlyPerformanceTable');
+            
+            table.innerHTML = monthlyData.map(month => {
+                // Calculate change from previous month
+                const index = monthlyData.indexOf(month);
+                const prevMonth = index > 0 ? monthlyData[index - 1] : null;
+                const change = prevMonth ? month.attendanceRate - prevMonth.attendanceRate : 0;
+                
+                // Determine status
+                let status = '';
+                let statusClass = '';
+                if (change > 0.5) {
+                    status = 'พัฒนาขึ้น';
+                    statusClass = 'trend-up';
+                } else if (change < -0.5) {
+                    status = 'ต้องปรับปรุง';
+                    statusClass = 'trend-down';
+                } else {
+                    status = 'คงที่';
+                    statusClass = 'trend-stable';
+                }
+                
+                // Calculate other metrics (for demo)
+                const normalClasses = Math.round(month.totalClasses * month.attendanceRate / 100 * 0.9);
+                const substituteClasses = Math.round(month.totalClasses * month.attendanceRate / 100 * 0.1);
+                const absentClasses = month.absentClasses;
+                const activityClasses = Math.round(month.totalClasses * 0.02);
+                
+                return `
+                    <tr>
+                        <td>${month.monthName} ${month.year + 543}</td>
+                        <td>${month.totalClasses.toLocaleString()}</td>
+                        <td>${normalClasses.toLocaleString()}</td>
+                        <td>${substituteClasses.toLocaleString()}</td>
+                        <td>${absentClasses.toLocaleString()}</td>
+                        <td>${activityClasses.toLocaleString()}</td>
+                        <td>${month.attendanceRate.toFixed(1)}%</td>
+                        <td class="${statusClass}">
+                            ${change >= 0 ? '+' : ''}${change.toFixed(1)}%
+                        </td>
+                        <td>
+                            <span class="badge ${statusClass === 'trend-up' ? 'bg-success' : 
+                                             statusClass === 'trend-down' ? 'bg-warning' : 'bg-info'}">
+                                ${status}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function updateYearComparison(yearlyData) {
+            const container = document.getElementById('yearComparison');
+            
+            container.innerHTML = yearlyData.map(yearData => {
+                // Calculate change from previous year
+                const index = yearlyData.indexOf(yearData);
+                const prevYear = index > 0 ? yearlyData[index - 1] : null;
+                const change = prevYear ? yearData.attendanceRate - prevYear.attendanceRate : 0;
+                
+                return `
+                    <div class="year-card">
+                        <div class="year-title">ปีการศึกษา ${yearData.year}</div>
+                        <div class="year-value">${yearData.attendanceRate}%</div>
+                        <div class="year-change">
+                            ${change >= 0 ? '+' : ''}${change.toFixed(1)}%
+                            ${change > 0 ? '🟢' : change < 0 ? '🔴' : '🟡'}
+                        </div>
+                        <small class="text-muted">${yearData.totalClasses.toLocaleString()} คาบ</small>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function updateDetailedComparisonTable(comparison) {
+            const table = document.getElementById('detailedComparisonTable');
+            const period1 = comparison.period1;
+            const period2 = comparison.period2;
+            
+            // Define comparison metrics
+            const metrics = [
+                {
+                    name: 'อัตราการเข้าเรียน',
+                    value1: period1.summary.avgAttendanceRate,
+                    value2: period2.summary.avgAttendanceRate,
+                    unit: '%'
+                },
+                {
+                    name: 'จำนวนคาบเรียนทั้งหมด',
+                    value1: period1.summary.totalClasses,
+                    value2: period2.summary.totalClasses,
+                    unit: ' คาบ'
+                },
+                {
+                    name: 'คาบที่สอนปกติ',
+                    value1: period1.summary.normalClasses,
+                    value2: period2.summary.normalClasses,
+                    unit: ' คาบ'
+                },
+                {
+                    name: 'คาบที่สอนแทน',
+                    value1: period1.summary.substituteClasses,
+                    value2: period2.summary.substituteClasses,
+                    unit: ' คาบ'
+                },
+                {
+                    name: 'คาบที่ไม่มีผู้สอน',
+                    value1: period1.summary.absentClasses,
+                    value2: period2.summary.absentClasses,
+                    unit: ' คาบ'
+                },
+                {
+                    name: 'จำนวนวันที่มีการสอน',
+                    value1: period1.summary.totalDays,
+                    value2: period2.summary.totalDays,
+                    unit: ' วัน'
+                },
+                {
+                    name: 'อัตราการขาดสอนของครู',
+                    value1: (period1.summary.absentClasses / period1.summary.totalClasses * 100).toFixed(1),
+                    value2: (period2.summary.absentClasses / period2.summary.totalClasses * 100).toFixed(1),
+                    unit: '%'
+                }
+            ];
+            
+            table.innerHTML = metrics.map(metric => {
+                const change = metric.value2 - metric.value1;
+                const changePercent = metric.value1 > 0 ? ((change / metric.value1) * 100).toFixed(1) : 0;
+                const trend = change > 0 ? 'up' : change < 0 ? 'down' : 'stable';
+                const status = getStatusFromTrend(trend);
+                
+                return `
+                    <tr>
+                        <td>${metric.name}</td>
+                        <td>${metric.value1.toLocaleString()}${metric.unit}</td>
+                        <td>${metric.value2.toLocaleString()}${metric.unit}</td>
+                        <td class="${trend}">
+                            ${change >= 0 ? '+' : ''}${change.toFixed(1)}${metric.unit}
+                        </td>
+                        <td>${change >= 0 ? '+' : ''}${changePercent}%</td>
+                        <td>
+                            <span class="badge ${status.class}">
+                                ${status.text}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function updateComparisonAreas(comparison) {
+            const period1 = comparison.period1;
+            const period2 = comparison.period2;
+            
+            // Generate improvement areas
+            const improvementAreas = document.getElementById('improvementAreas');
+            improvementAreas.innerHTML = `
+                <ul class="mb-0">
+                    <li>อัตราการเข้าเรียนเพิ่มขึ้น ${(period2.summary.avgAttendanceRate - period1.summary.avgAttendanceRate).toFixed(1)}%</li>
+                    <li>จำนวนคาบที่สอนปกติเพิ่มขึ้น ${(period2.summary.normalClasses - period1.summary.normalClasses).toLocaleString()} คาบ</li>
+                    <li>จำนวนวันที่มีการสอนเพิ่มขึ้น ${period2.summary.totalDays - period1.summary.totalDays} วัน</li>
+                </ul>
+            `;
+            
+            // Generate decline areas
+            const declineAreas = document.getElementById('declineAreas');
+            const absentChange = period2.summary.absentClasses - period1.summary.absentClasses;
+            const substituteChange = period2.summary.substituteClasses - period1.summary.substituteClasses;
+            
+            let declineItems = [];
+            if (absentChange > 0) {
+                declineItems.push(`จำนวนคาบที่ไม่มีผู้สอนเพิ่มขึ้น ${absentChange.toLocaleString()} คาบ`);
+            }
+            if (substituteChange > 0) {
+                declineItems.push(`จำนวนคาบที่สอนแทนเพิ่มขึ้น ${substituteChange.toLocaleString()} คาบ`);
+            }
+            
+            if (declineItems.length > 0) {
+                declineAreas.innerHTML = `<ul class="mb-0">${declineItems.map(item => `<li>${item}</li>`).join('')}</ul>`;
+            } else {
+                declineAreas.innerHTML = '<p class="mb-0 text-muted">ไม่มีด้านที่ต้องปรับปรุง</p>';
+            }
+            
+            // Generate stable areas
+            const stableAreas = document.getElementById('stableAreas');
+            stableAreas.innerHTML = `
+                <ul class="mb-0">
+                    <li>จำนวนครูผู้สอนคงที่</li>
+                    <li>จำนวนห้องเรียนที่เปิดสอนคงที่</li>
+                    <li>โครงสร้างหลักสูตรคงที่</li>
+                </ul>
+            `;
+        }
+        
+        function getStatusFromTrend(trend) {
+            switch(trend) {
+                case 'up':
+                    return { class: 'bg-success', text: 'ดีขึ้น' };
+                case 'down':
+                    return { class: 'bg-warning', text: 'ลดลง' };
+                default:
+                    return { class: 'bg-info', text: 'คงที่' };
+            }
+        }
+        
+        function initializeRetrospectiveCharts() {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            
+            const current = retrospectiveData.current;
+            const summary = retrospectiveData.summary;
+            
+            if (!current || !summary) return;
+            
+            // Attendance Trend Chart
+            const trendCtx = document.getElementById('attendanceTrendChart').getContext('2d');
+            const dailyData = current.dailyData;
+            
+            charts.attendanceTrend = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: dailyData.map(d => d.date),
+                    datasets: [
+                        {
+                            label: 'อัตราการเข้าเรียน (%)',
+                            data: dailyData.map(d => d.attendanceRate),
+                            borderColor: chartColors.primary,
+                            backgroundColor: 'rgba(192, 0, 0, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: dailyData.map(d => 
+                                d.attendanceRate >= 95 ? chartColors.success :
+                                d.attendanceRate >= 90 ? chartColors.info :
+                                d.attendanceRate >= 85 ? chartColors.warning : chartColors.danger
+                            ),
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 85,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'อัตราการเข้าเรียน (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'วันที่'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Grade Distribution Chart
+            const gradeCtx = document.getElementById('gradeDistributionChart').getContext('2d');
+            const gradeData = current.gradeData;
+            
+            charts.gradeDistribution = new Chart(gradeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: gradeData.map(g => g.grade),
+                    datasets: [{
+                        data: gradeData.map(g => g.attendanceRate),
+                        backgroundColor: [
+                            chartColors.grade1,
+                            chartColors.grade2,
+                            chartColors.grade3,
+                            chartColors.grade4,
+                            chartColors.grade5,
+                            chartColors.grade6
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        datalabels: {
+                            formatter: (value) => `${value.toFixed(1)}%`,
+                            color: '#fff',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+            
+            // Yearly Trend Chart
+            const yearlyCtx = document.getElementById('yearlyTrendChart').getContext('2d');
+            const monthlyData = summary.monthlyData;
+            
+            charts.yearlyTrend = new Chart(yearlyCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyData.map(m => m.monthName),
+                    datasets: [
+                        {
+                            label: 'อัตราการเข้าเรียน (%)',
+                            data: monthlyData.map(m => m.attendanceRate),
+                            borderColor: chartColors.primary,
+                            backgroundColor: 'rgba(192, 0, 0, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 90,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'อัตราการเข้าเรียน (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Grade Comparison Chart (if comparison data exists)
+            if (retrospectiveData.comparison) {
+                const comparison = retrospectiveData.comparison;
+                const gradeComparisonCtx = document.getElementById('gradeComparisonChart').getContext('2d');
+                
+                // For demo, create sample grade comparison data
+                const gradeComparisonData = [
+                    { grade: 'ม.1', period1: 94.2, period2: 95.5 },
+                    { grade: 'ม.2', period1: 93.8, period2: 95.1 },
+                    { grade: 'ม.3', period1: 95.3, period2: 96.4 },
+                    { grade: 'ม.4', period1: 92.7, period2: 93.9 },
+                    { grade: 'ม.5', period1: 94.9, period2: 96.2 },
+                    { grade: 'ม.6', period1: 96.4, period2: 97.5 }
+                ];
+                
+                charts.gradeComparison = new Chart(gradeComparisonCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: gradeComparisonData.map(g => g.grade),
+                        datasets: [
+                            {
+                                label: comparison.period1Label,
+                                data: gradeComparisonData.map(g => g.period1),
+                                backgroundColor: chartColors.info,
+                                borderWidth: 1
+                            },
+                            {
+                                label: comparison.period2Label,
+                                data: gradeComparisonData.map(g => g.period2),
+                                backgroundColor: chartColors.primary,
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 90,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'อัตราการเข้าเรียน (%)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Initialize insights
+            initializeInsights();
+        }
+        
+        function initializeInsights() {
+            const current = retrospectiveData.current;
+            const comparison = retrospectiveData.comparison;
+            
+            if (!current) return;
+            
+            // Key Insights
+            const keyInsights = document.getElementById('keyInsights');
+            const avgAttendance = current.summary.avgAttendanceRate;
+            
+            let insightsHTML = '';
+            
+            if (avgAttendance >= 95) {
+                insightsHTML = `
+                    <p>✅ <strong>ดีเยี่ยม:</strong> อัตราการเข้าเรียนเฉลี่ย ${avgAttendance}% สูงกว่าเป้าหมาย (95%)</p>
+                    <p>✅ <strong>มีเสถียรภาพ:</strong> ความผันผวนระหว่างวันต่ำ แสดงถึงการจัดการที่มีประสิทธิภาพ</p>
+                    <p>✅ <strong>ครูผู้สอนมีประสิทธิภาพ:</strong> อัตราการสอนปกติสูง แสดงถึงความพร้อมของครู</p>
+                `;
+            } else if (avgAttendance >= 90) {
+                insightsHTML = `
+                    <p>✅ <strong>อยู่ในเกณฑ์ดี:</strong> อัตราการเข้าเรียนเฉลี่ย ${avgAttendance}% อยู่ในระดับที่น่าพอใจ</p>
+                    <p>⚠️ <strong>ควรปรับปรุง:</strong> มีโอกาสพัฒนาอีก ${(95 - avgAttendance).toFixed(1)}% เพื่อให้ถึงเป้าหมาย</p>
+                    <p>📊 <strong>จุดที่ต้องเน้น:</strong> ระดับชั้นที่มีอัตราการเข้าเรียนต่ำกว่าค่าเฉลี่ย</p>
+                `;
+            } else {
+                insightsHTML = `
+                    <p>⚠️ <strong>ต้องปรับปรุง:</strong> อัตราการเข้าเรียนเฉลี่ย ${avgAttendance}% ต่ำกว่าเกณฑ์มาตรฐาน</p>
+                    <p>🔍 <strong>ควรวิเคราะห์:</strong> สาเหตุหลักของการขาดเรียนเพื่อหาทางแก้ไข</p>
+                    <p>🎯 <strong>ตั้งเป้าหมาย:</strong> ควรตั้งเป้าหมายเพิ่มอัตราการเข้าเรียนให้ได้อย่างน้อย 90%</p>
+                `;
+            }
+            
+            keyInsights.innerHTML = insightsHTML;
+            
+            // Success Stories
+            const successStories = document.getElementById('successStories');
+            const topGrade = [...current.gradeData].sort((a, b) => b.attendanceRate - a.attendanceRate)[0];
+            const topTeacher = [...current.teacherData].sort((a, b) => b.attendanceRate - a.attendanceRate)[0];
+            
+            successStories.innerHTML = `
+                <ul class="mb-0">
+                    <li>ระดับชั้น ${topGrade.grade} มีอัตราการเข้าเรียนสูงสุดที่ ${topGrade.attendanceRate.toFixed(1)}%</li>
+                    <li>${topTeacher.teacher} มีอัตราการสอนปกติสูงสุดที่ ${topTeacher.attendanceRate.toFixed(1)}%</li>
+                    <li>จำนวนวันที่มีการสอนครบทุกคาบ: ${current.dailyData.filter(d => d.attendanceRate >= 95).length} วัน</li>
+                </ul>
+            `;
+            
+            // Issues to Address
+            const issuesToAddress = document.getElementById('issuesToAddress');
+            const bottomGrade = [...current.gradeData].sort((a, b) => a.attendanceRate - b.attendanceRate)[0];
+            const lowAttendanceDays = current.dailyData.filter(d => d.attendanceRate < 90);
+            
+            let issuesHTML = '';
+            if (bottomGrade.attendanceRate < 90) {
+                issuesHTML += `<li>ระดับชั้น ${bottomGrade.grade} มีอัตราการเข้าเรียนต่ำ (${bottomGrade.attendanceRate.toFixed(1)}%)</li>`;
+            }
+            if (lowAttendanceDays.length > 0) {
+                issuesHTML += `<li>มี ${lowAttendanceDays.length} วันที่มีอัตราการเข้าเรียนต่ำกว่า 90%</li>`;
+            }
+            if (current.summary.absentClasses > 10) {
+                issuesHTML += `<li>มีคาบที่ไม่มีผู้สอนจำนวน ${current.summary.absentClasses} คาบ</li>`;
+            }
+            
+            if (issuesHTML) {
+                issuesToAddress.innerHTML = `<ul class="mb-0">${issuesHTML}</ul>`;
+            } else {
+                issuesToAddress.innerHTML = '<p class="mb-0 text-muted">ไม่มีประเด็นสำคัญที่ต้องแก้ไข</p>';
+            }
+            
+            // Development Opportunities
+            const developmentOpportunities = document.getElementById('developmentOpportunities');
+            developmentOpportunities.innerHTML = `
+                <ul class="mb-0">
+                    <li>พัฒนาระบบแจ้งเตือนล่วงหน้าสำหรับครูที่อาจขาดสอน</li>
+                    <li>สร้างแรงจูงใจสำหรับครูที่มีอัตราการสอนปกติสูง</li>
+                    <li>ปรับปรุงระบบรายงานการสอนให้ง่ายและรวดเร็วยิ่งขึ้น</li>
+                    <li>พัฒนาการฝึกอบรมครูในด้านการจัดการห้องเรียน</li>
+                </ul>
+            `;
+            
+            // Future Trends
+            const futureTrends = document.getElementById('futureTrends');
+            futureTrends.innerHTML = `
+                <ul class="mb-0">
+                    <li>คาดว่าอัตราการเข้าเรียนจะเพิ่มขึ้นอย่างต่อเนื่อง</li>
+                    <li>จำนวนคาบที่สอนแทนมีแนวโน้มลดลง</li>
+                    <li>ครูใหม่จะปรับตัวและมีประสิทธิภาพมากขึ้น</li>
+                    <li>ระบบดิจิทัลจะช่วยเพิ่มประสิทธิภาพการจัดการ</li>
+                </ul>
+            `;
+            
+            // Recommendations
+            const shortTermRecs = document.getElementById('shortTermRecommendations');
+            const longTermRecs = document.getElementById('longTermRecommendations');
+            
+            shortTermRecs.innerHTML = `
+                <li>ประชุมทบทวนกับครูที่มีอัตราการขาดสอนสูง</li>
+                <li>ตรวจสอบและแก้ไขปัญหาการรายงานการสอน</li>
+                <li>ให้คำปรึกษาแก่ระดับชั้นที่มีอัตราการเข้าเรียนต่ำ</li>
+                <li>ปรับปรุงระบบแจ้งเตือนการขาดสอน</li>
+            `;
+            
+            longTermRecs.innerHTML = `
+                <li>พัฒนาระบบประเมินผลครูอย่างเป็นระบบ</li>
+                <li>สร้างวัฒนธรรมการรายงานการสอนที่โปร่งใส</li>
+                <li>จัดฝึกอบรมพัฒนาศักยภาพครูอย่างต่อเนื่อง</li>
+                <li>ปรับปรุงโครงสร้างการสนับสนุนครูผู้สอน</li>
+            `;
+            
+            // Update print insights
+            document.getElementById('printInsights').innerHTML = insightsHTML;
+            
+            // Initialize timeline
+            initializeTimeline();
+        }
+        
+        function initializeTimeline() {
+            const timeline = document.getElementById('developmentTimeline');
+            const milestones = document.getElementById('milestonesGrid');
+            const now = new Date();
+            
+            // Generate timeline items (last 6 months)
+            let timelineHTML = '';
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 15);
+                const month = date.getMonth();
+                const monthName = thaiMonths[month];
+                const year = date.getFullYear() + 543;
+                
+                // Generate sample events
+                const events = [
+                    `อัตราการเข้าเรียน ${92 + Math.random() * 5}%`,
+                    `ครู ${2 + Math.floor(Math.random() * 3)} คนได้รับการฝึกอบรม`,
+                    `ปรับปรุงระบบรายงานการสอน`,
+                    `ประชุมทบทวนประสิทธิภาพ`
+                ];
+                
+                const randomEvent = events[Math.floor(Math.random() * events.length)];
+                
+                timelineHTML += `
+                    <div class="timeline-item">
+                        <div class="timeline-date">${monthName} ${year}</div>
+                        <div class="timeline-content">
+                            <h6>กิจกรรมสำคัญ</h6>
+                            <p>${randomEvent}</p>
+                            <small class="text-muted">ความคืบหน้า: ${70 + Math.floor(Math.random() * 30)}%</small>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            timeline.innerHTML = timelineHTML;
+            
+            // Generate milestones
+            const milestoneData = [
+                { title: 'เป้าหมายอัตราการเข้าเรียน', value: '95%', status: 'กำลังดำเนินการ', color: 'warning' },
+                { title: 'ครูที่ผ่านการฝึกอบรม', value: '85%', status: 'สำเร็จ', color: 'success' },
+                { title: 'ระบบรายงานดิจิทัล', value: '100%', status: 'สำเร็จ', color: 'success' },
+                { title: 'การลดคาบว่าง', value: '40%', status: 'กำลังดำเนินการ', color: 'info' }
+            ];
+            
+            milestones.innerHTML = milestoneData.map(milestone => `
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5>${milestone.value}</h5>
+                            <p class="mb-1">${milestone.title}</p>
+                            <span class="badge bg-${milestone.color}">${milestone.status}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function setupEventListeners() {
+            // Filter form submission
+            document.getElementById('retrospectiveFilterForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const type = document.getElementById('retrospectiveType').value;
+                if (type === 'custom') {
+                    loadRetrospectiveData('custom');
+                } else {
+                    loadRetrospectiveData('current');
+                }
+                window.app.showToast('วิเคราะห์ข้อมูลย้อนหลังสำเร็จ');
+            });
+            
+            // Retrospective type change
+            document.getElementById('retrospectiveType').addEventListener('change', function() {
+                const type = this.value;
+                const customDateFields = document.getElementById('retrospectiveStart').closest('.row');
+                
+                if (type === 'custom') {
+                    customDateFields.style.display = 'flex';
+                } else {
+                    customDateFields.style.display = 'none';
+                    updateDateRangeByType(type);
+                }
+            });
+            
+            // Comparison type change
+            document.getElementById('compareWith').addEventListener('change', function() {
+                if (this.value !== 'none') {
+                    loadComparisonData(this.value);
+                }
+            });
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.app.showLogoutConfirm();
+            });
+        }
+        
+        function updateDateRangeByType(type) {
+            const now = new Date();
+            let startDate, endDate = now;
+            
+            switch(type) {
+                case 'monthly':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                    break;
+                case 'quarterly':
+                    const quarter = Math.floor(now.getMonth() / 3);
+                    startDate = new Date(now.getFullYear(), quarter * 3, 1);
+                    endDate = new Date(now.getFullYear(), quarter * 3 + 3, 0);
+                    break;
+                case 'semester':
+                    const semester = now.getMonth() >= 5 ? 1 : 2; // May-Oct = 1st semester
+                    if (semester === 1) {
+                        startDate = new Date(now.getFullYear(), 4, 1); // May 1st
+                        endDate = new Date(now.getFullYear(), 9, 30); // October 31st
+                    } else {
+                        startDate = new Date(now.getFullYear(), 10, 1); // November 1st
+                        endDate = new Date(now.getFullYear() + 1, 3, 30); // April 30th
+                    }
+                    break;
+                case 'yearly':
+                    const currentMonth = now.getMonth();
+                    if (currentMonth >= 5) { // After May
+                        startDate = new Date(now.getFullYear(), 4, 1); // May 1st
+                        endDate = new Date(now.getFullYear() + 1, 3, 30); // April 30th next year
+                    } else {
+                        startDate = new Date(now.getFullYear() - 1, 4, 1);
+                        endDate = new Date(now.getFullYear(), 3, 30);
+                    }
+                    break;
+            }
+            
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            
+            document.getElementById('retrospectiveStart').value = formatDate(startDate);
+            document.getElementById('retrospectiveEnd').value = formatDate(endDate);
+        }
+        
+        function resetRetrospectiveFilters() {
+            document.getElementById('retrospectiveType').value = 'monthly';
+            document.getElementById('compareWith').value = 'previous_period';
+            setDefaultDates();
+            loadRetrospectiveData('current');
+            window.app.showToast('รีเซ็ตตัวกรองสำเร็จ');
+        }
+        
+        function refreshRetrospectiveData() {
+            if (selectedMonth) {
+                loadRetrospectiveData('specific', selectedMonth);
+            } else {
+                loadRetrospectiveData('current');
+            }
+            window.app.showToast('รีเฟรชข้อมูลสำเร็จ');
+        }
+        
+        function generateRetrospectivePDF() {
+            window.app.showToast('กำลังสร้างรายงาน PDF...');
+            // In production, implement PDF generation
+            // You can use libraries like jsPDF or make API call
+        }
+        
+        function exportRetrospectiveExcel() {
+            window.app.showToast('กำลังสร้างรายงาน Excel...');
+            // In production, implement Excel export
+        }
+    </script>
+</body>
+</html>

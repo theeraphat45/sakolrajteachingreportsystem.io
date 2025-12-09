@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติรายงาน | โรงเรียนสกลราชวิทยานุกูล</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-red: #C00000;
+            --secondary-red: #D32F2F;
+            --light-red: #FFEBEE;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --dark-gray: #495057;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+        }
+        
+        .bg-school-red {
+            background-color: var(--primary-red) !important;
+        }
+        
+        .text-school-red {
+            color: var(--primary-red) !important;
+        }
+        
+        .btn-school-red {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+        }
+        
+        .btn-school-red:hover {
+            background-color: var(--secondary-red);
+            color: white;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .history-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .filter-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .footer {
+            background-color: var(--white);
+            border-top: 1px solid #dee2e6;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+        
+        .table-history {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .table-history thead {
+            background-color: var(--primary-red);
+            color: white;
+        }
+        
+        .badge-status {
+            font-size: 0.8em;
+            padding: 5px 10px;
+        }
+        
+        .history-item {
+            border-left: 4px solid var(--primary-red);
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: white;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .history-item.completed {
+            border-left-color: #28a745;
+        }
+        
+        .history-item.pending {
+            border-left-color: #ffc107;
+        }
+        
+        .history-item.cancelled {
+            border-left-color: #dc3545;
+        }
+        
+        .pagination .page-link {
+            color: var(--primary-red);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#" id="dashboardLink">
+                <img src="assets/logo.png" alt="Logo" class="me-2">
+                <div>
+                    <div class="fw-bold text-school-red" style="line-height: 1.2;">ระบบบันทึกการเรียนการสอน</div>
+                    <small class="text-muted">โรงเรียนสกลราชวิทยานุกูล</small>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="report.html">
+                            <i class="bi bi-plus-circle text-school-red me-1"></i>เพิ่มรายงาน
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-2 text-school-red"></i>
+                            <span id="userName">ผู้ใช้งาน</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person me-2"></i>โปรไฟล์</a></li>
+                            <li><a class="dropdown-item" href="history.html"><i class="bi bi-clock-history me-2"></i>ประวัติรายงาน</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i>ออกจากระบบ</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-school-red mb-1">ประวัติรายงานการสอน</h2>
+                    <p class="text-muted">ดูประวัติการรายงานการสอนทั้งหมด</p>
+                </div>
+            </div>
+            <!-- Filters -->
+            <div class="filter-card">
+                <h5 class="fw-bold text-school-red mb-3"><i class="bi bi-funnel me-2"></i>ตัวกรองข้อมูล</h5>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">วันที่เริ่มต้น</label>
+                        <input type="date" class="form-control" id="startDate" value="2024-11-01">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">วันที่สิ้นสุด</label>
+                        <input type="date" class="form-control" id="endDate" value="2024-11-20">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">ระดับชั้น</label>
+                        <select class="form-select" id="filterLevel">
+                            <option value="all">ทั้งหมด</option>
+                            <option value="1">มัธยมศึกษาปีที่ 1</option>
+                            <option value="2">มัธยมศึกษาปีที่ 2</option>
+                            <option value="3">มัธยมศึกษาปีที่ 3</option>
+                            <option value="4">มัธยมศึกษาปีที่ 4</option>
+                            <option value="5">มัธยมศึกษาปีที่ 5</option>
+                            <option value="6">มัธยมศึกษาปีที่ 6</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">สถานะ</label>
+                        <select class="form-select" id="filterStatus">
+                            <option value="all">ทั้งหมด</option>
+                            <option value="completed">รายงานแล้ว</option>
+                            <option value="pending">รอดำเนินการ</option>
+                            <option value="cancelled">ยกเลิก</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-school-red me-2" id="applyFilter">
+                        <i class="bi bi-funnel me-2"></i>ใช้ตัวกรอง
+                    </button>
+                    <button class="btn btn-outline-school-red" id="resetFilter">
+                        <i class="bi bi-arrow-clockwise me-2"></i>รีเซ็ต
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="history-card text-center">
+                        <h3 class="text-school-red">28</h3>
+                        <p class="text-muted mb-0">รายงานทั้งหมด</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="history-card text-center">
+                        <h3 class="text-success">24</h3>
+                        <p class="text-muted mb-0">รายงานสำเร็จ</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="history-card text-center">
+                        <h3 class="text-warning">3</h3>
+                        <p class="text-muted mb-0">รอดำเนินการ</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="history-card text-center">
+                        <h3 class="text-danger">1</h3>
+                        <p class="text-muted mb-0">ยกเลิก</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- History List (Table View) -->
+            <div class="card mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-school-red">รายการประวัติรายงาน</h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-school-red active" id="tableViewBtn">
+                            <i class="bi bi-table"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-school-red" id="cardViewBtn">
+                            <i class="bi bi-card-list"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Table View -->
+                    <div class="table-responsive" id="tableView">
+                        <table class="table table-hover table-history mb-0">
+                            <thead>
+                                <tr>
+                                    <th>วันที่</th>
+                                    <th>ห้อง</th>
+                                    <th>คาบ</th>
+                                    <th>วิชา</th>
+                                    <th>ครูผู้สอน</th>
+                                    <th>ผู้รายงาน</th>
+                                    <th>เวลา</th>
+                                    <th>สถานะ</th>
+                                    <th>การดำเนินการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTable">
+                                <tr>
+                                    <td>20/11/2024</td>
+                                    <td>ม.5/2</td>
+                                    <td>1-2</td>
+                                    <td>คณิตศาสตร์ 4</td>
+                                    <td>คุณครูวีระพล สุวรรณชัยรบ</td>
+                                    <td>นักเรียน ม.5/2</td>
+                                    <td>08:35</td>
+                                    <td><span class="badge bg-success badge-status">สมบูรณ์</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>20/11/2024</td>
+                                    <td>ม.6/1</td>
+                                    <td>3-4</td>
+                                    <td>คณิตศาสตร์เพิ่มเติม 4</td>
+                                    <td>คุณครูรุจิพัชญ์ อรุวีวัฒนานนท์</td>
+                                    <td>นักเรียน ม.6/1</td>
+                                    <td>10:20</td>
+                                    <td><span class="badge bg-success badge-status">สมบูรณ์</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>19/11/2024</td>
+                                    <td>ม.4/3</td>
+                                    <td>5-6</td>
+                                    <td>โครงงานคณิตศาสตร์ 1</td>
+                                    <td>คุณครูผุสดี บุญหงษ์</td>
+                                    <td>นักเรียน ม.4/3</td>
+                                    <td>13:05</td>
+                                    <td><span class="badge bg-success badge-status">สมบูรณ์</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>19/11/2024</td>
+                                    <td>ม.5/2</td>
+                                    <td>1-2</td>
+                                    <td>คณิตศาสตร์ 4</td>
+                                    <td>คุณครูวีระพล สุวรรณชัยรบ</td>
+                                    <td>นักเรียน ม.5/2</td>
+                                    <td>08:40</td>
+                                    <td><span class="badge bg-success badge-status">สมบูรณ์</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>18/11/2024</td>
+                                    <td>ม.6/1</td>
+                                    <td>3-4</td>
+                                    <td>คณิตศาสตร์เพิ่มเติม 4</td>
+                                    <td>คุณครูรุจิพัชญ์ อรุวีวัฒนานนท์</td>
+                                    <td>นักเรียน ม.6/1</td>
+                                    <td>10:15</td>
+                                    <td><span class="badge bg-success badge-status">สมบูรณ์</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>18/11/2024</td>
+                                    <td>ม.3/1</td>
+                                    <td>5-6</td>
+                                    <td>วิทยาศาสตร์</td>
+                                    <td>คุณครูดาราวรรณ ศรีทอง</td>
+                                    <td>นักเรียน ม.3/1</td>
+                                    <td>13:10</td>
+                                    <td><span class="badge bg-warning badge-status">รอดำเนินการ</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>15/11/2024</td>
+                                    <td>ม.2/2</td>
+                                    <td>1-2</td>
+                                    <td>ภาษาอังกฤษ</td>
+                                    <td>คุณครูสุพจน์ หิรัญเกิด</td>
+                                    <td>นักเรียน ม.2/2</td>
+                                    <td>08:45</td>
+                                    <td><span class="badge bg-danger badge-status">ยกเลิก</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-school-red">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Card View -->
+                    <div class="p-3" id="cardView" style="display: none;">
+                        <div class="row" id="historyCards">
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="history-item completed">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="fw-bold mb-0">ม.5/2 - คณิตศาสตร์ 4</h6>
+                                        <span class="badge bg-success badge-status">สมบูรณ์</span>
+                                    </div>
+                                    <p class="small mb-2"><i class="bi bi-calendar me-1"></i> 20/11/2024</p>
+                                    <p class="small mb-2"><i class="bi bi-clock me-1"></i> คาบ 1-2 (08:35)</p>
+                                    <p class="small mb-2"><i class="bi bi-person me-1"></i> คุณครูวีระพล สุวรรณชัยรบ</p>
+                                    <p class="small mb-0"><i class="bi bi-person-check me-1"></i> รายงานโดย: นักเรียน ม.5/2</p>
+                                    <div class="mt-3">
+                                        <button class="btn btn-sm btn-outline-school-red w-100">
+                                            <i class="bi bi-eye me-1"></i>ดูรายละเอียด
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="history-item completed">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="fw-bold mb-0">ม.6/1 - คณิตศาสตร์เพิ่มเติม 4</h6>
+                                        <span class="badge bg-success badge-status">สมบูรณ์</span>
+                                    </div>
+                                    <p class="small mb-2"><i class="bi bi-calendar me-1"></i> 20/11/2024</p>
+                                    <p class="small mb-2"><i class="bi bi-clock me-1"></i> คาบ 3-4 (10:20)</p>
+                                    <p class="small mb-2"><i class="bi bi-person me-1"></i> คุณครูรุจิพัชญ์ อรุวีวัฒนานนท์</p>
+                                    <p class="small mb-0"><i class="bi bi-person-check me-1"></i> รายงานโดย: นักเรียน ม.6/1</p>
+                                    <div class="mt-3">
+                                        <button class="btn btn-sm btn-outline-school-red w-100">
+                                            <i class="bi bi-eye me-1"></i>ดูรายละเอียด
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="history-item pending">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="fw-bold mb-0">ม.3/1 - วิทยาศาสตร์</h6>
+                                        <span class="badge bg-warning badge-status">รอดำเนินการ</span>
+                                    </div>
+                                    <p class="small mb-2"><i class="bi bi-calendar me-1"></i> 18/11/2024</p>
+                                    <p class="small mb-2"><i class="bi bi-clock me-1"></i> คาบ 5-6 (13:10)</p>
+                                    <p class="small mb-2"><i class="bi bi-person me-1"></i> คุณครูดาราวรรณ ศรีทอง</p>
+                                    <p class="small mb-0"><i class="bi bi-person-check me-1"></i> รายงานโดย: นักเรียน ม.3/1</p>
+                                    <div class="mt-3">
+                                        <button class="btn btn-sm btn-school-red w-100">
+                                            <i class="bi bi-pencil me-1"></i>ดำเนินการต่อ
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Export Options -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 text-school-red">ส่งออกข้อมูล</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">ดาวน์โหลดประวัติรายงานในรูปแบบต่าง ๆ</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-school-red">
+                            <i class="bi bi-filetype-pdf me-2"></i>PDF
+                        </button>
+                        <button class="btn btn-outline-school-red">
+                            <i class="bi bi-filetype-xlsx me-2"></i>Excel
+                        </button>
+                        <button class="btn btn-outline-school-red">
+                            <i class="bi bi-filetype-csv me-2"></i>CSV
+                        </button>
+                        <button class="btn btn-outline-school-red">
+                            <i class="bi bi-printer me-2"></i>พิมพ์
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">พัฒนาโดยฝ่ายบริหารงานวิชาการ โรงเรียนสกลราชวิทยานุกูล</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 text-muted">© 2024 สงวนลิขสิทธิ์</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Report Detail Modal -->
+    <div class="modal fade" id="reportDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-school-red">
+                        <i class="bi bi-file-text me-2"></i>รายละเอียดรายงาน
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>วันที่:</strong> <span id="detailDate">20/11/2024</span></p>
+                            <p><strong>ห้องเรียน:</strong> <span id="detailClass">ม.5/2</span></p>
+                            <p><strong>คาบเรียน:</strong> <span id="detailPeriod">คาบ 1-2 (08:30-10:10)</span></p>
+                            <p><strong>วิชา:</strong> <span id="detailSubject">คณิตศาสตร์ 4 (ค32102)</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>ครูผู้สอน:</strong> <span id="detailTeacher">คุณครูวีระพล สุวรรณชัยรบ</span></p>
+                            <p><strong>ผู้รายงาน:</strong> <span id="detailReporter">นักเรียน ม.5/2</span></p>
+                            <p><strong>เวลารายงาน:</strong> <span id="detailTime">08:35 น.</span></p>
+                            <p><strong>สถานะ:</strong> <span id="detailStatus" class="badge bg-success">สมบูรณ์</span></p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="text-school-red">หมายเหตุ:</h6>
+                        <p id="detailNote">สอนตามแผนการสอนที่กำหนด ใช้สื่อการสอน PowerPoint ประกอบการเรียน นักเรียนให้ความร่วมมือเป็นอย่างดี</p>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="text-school-red">ข้อมูลเพิ่มเติม:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle text-success me-2"></i> สอนครบตามแผน</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i> ใช้สื่อการสอน</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i> มีการประเมินผล</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-school-red" data-bs-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check session
+            const session = localStorage.getItem('userSession');
+            if (!session) {
+                window.location.href = 'login.html';
+            } else {
+                const userData = JSON.parse(session);
+                document.getElementById('userName').textContent = userData.name;
+                
+                // Set dashboard link based on role
+                const dashboardLink = document.getElementById('dashboardLink');
+                switch(userData.role) {
+                    case 'admin':
+                        dashboardLink.href = 'dashboard_admin.html';
+                        break;
+                    case 'teacher':
+                        dashboardLink.href = 'dashboard_teacher.html';
+                        break;
+                    case 'student':
+                        dashboardLink.href = 'dashboard_student.html';
+                        break;
+                    default:
+                        dashboardLink.href = 'index.html';
+                }
+            }
+            
+            // View toggle
+            document.getElementById('tableViewBtn').addEventListener('click', function() {
+                document.getElementById('tableView').style.display = 'block';
+                document.getElementById('cardView').style.display = 'none';
+                this.classList.add('active');
+                document.getElementById('cardViewBtn').classList.remove('active');
+            });
+            
+            document.getElementById('cardViewBtn').addEventListener('click', function() {
+                document.getElementById('tableView').style.display = 'none';
+                document.getElementById('cardView').style.display = 'block';
+                this.classList.add('active');
+                document.getElementById('tableViewBtn').classList.remove('active');
+            });
+            
+            // Filter functionality
+            document.getElementById('applyFilter').addEventListener('click', function() {
+                alert('กรองข้อมูลตามเงื่อนไขที่เลือก');
+                // In a real app, this would filter the data
+            });
+            
+            document.getElementById('resetFilter').addEventListener('click', function() {
+                document.getElementById('startDate').value = '2024-11-01';
+                document.getElementById('endDate').value = '2024-11-20';
+                document.getElementById('filterLevel').value = 'all';
+                document.getElementById('filterStatus').value = 'all';
+                alert('รีเซ็ตตัวกรองแล้ว');
+            });
+            
+            // View report detail
+            document.querySelectorAll('#historyTable button, #historyCards button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = new bootstrap.Modal(document.getElementById('reportDetailModal'));
+                    modal.show();
+                });
+            });
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
+                    localStorage.removeItem('userSession');
+                    window.location.href = 'login.html';
+                }
+            });
+            
+            // Export buttons
+            document.querySelectorAll('.card-body button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const format = this.textContent.includes('PDF') ? 'PDF' : 
+                                  this.textContent.includes('Excel') ? 'Excel' :
+                                  this.textContent.includes('CSV') ? 'CSV' : 'Print';
+                    alert(`กำลังดาวน์โหลดไฟล์ในรูปแบบ ${format}...`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
